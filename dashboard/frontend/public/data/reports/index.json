@@ -1,0 +1,24 @@
+[
+  {
+    "batch_id": "报告 1",
+    "title": "报告 1",
+    "date": "2026-06-26",
+    "engine_version": "",
+    "models": [
+      "Claude Fable 5",
+      "Claude Opus 4.8"
+    ],
+    "report_count": 4
+  },
+  {
+    "batch_id": "报告 2",
+    "title": "报告 2",
+    "date": "2026-06-26",
+    "engine_version": "",
+    "models": [
+      "Claude Fable 5",
+      "Claude Opus 4.8"
+    ],
+    "report_count": 4
+  }
+]

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-evalkit"
+version = "0.1.0"
+description = "Evaluation framework for AI agents that produce files and call tools"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6",
+    "openai>=1.40",
+    "filelock>=3.13",
+]
+
+[project.scripts]
+evalkit = "evalkit.cli:main"
+
+[tool.setuptools]
+packages = ["evalkit", "adapters"]

@@ -1,0 +1,35 @@
+name: example_qa
+description: A tiny text-only QA task to demo the eval loop end to end.
+version: 1
+owner: "@you"
+tags: [example]
+
+fixtures_file: fixtures.jsonl
+
+runtime:
+  concurrency: 4
+  timeout_per_fixture_s: 120
+  attempts: 1
+  # adapter_config is handed verbatim to the adapter. For openai_chat you
+  # can set base_url / system_prompt / price_per_1k_input|output here.
+  adapter_config: {}
+
+scoring:
+  primary_metric: judge_score
+  aggregate: mean
+
+assertions:
+  response_min_chars: 20
+  tool_call_count_max: 50
+
+judge:
+  rubric_file: rubric.md
+  model: gpt-4o-2024-11-20
+  scale: [0, 5]
+  threshold_per_fixture: 3
+  on_response: true
+  on_tool_trace: false
+
+guard:
+  drop_threshold_pct: 5
+  cost_explosion_pct: 50

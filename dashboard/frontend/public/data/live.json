@@ -1,0 +1,67 @@
+{
+  "mode": "chain",
+  "chain_id": "mock-live-chain",
+  "chain_started_at": "2026-06-26T08:00:00Z",
+  "models": [
+    "Claude Fable 5",
+    "Claude Opus 4.8"
+  ],
+  "tasks": [
+    "测试集 1",
+    "测试集 2",
+    "测试集 3"
+  ],
+  "order": "model-major",
+  "total_cells": 6,
+  "done_cells": 2,
+  "failed_cells": 0,
+  "running_cells": 1,
+  "pending_cells": 3,
+  "finished": false,
+  "timeout_per_cell_s": 600,
+  "has_plan": true,
+  "cells": [
+    {
+      "model": "Claude Fable 5",
+      "task": "测试集 1",
+      "status": "done",
+      "score": null,
+      "badcases": 0,
+      "elapsed_s": 1180
+    },
+    {
+      "model": "Claude Fable 5",
+      "task": "测试集 2",
+      "status": "done",
+      "score": null,
+      "badcases": 0,
+      "elapsed_s": 970
+    },
+    {
+      "model": "Claude Fable 5",
+      "task": "测试集 3",
+      "status": "running",
+      "progress": {
+        "run_id": "mock-live-run",
+        "done": 2,
+        "total": 3,
+        "latest_fixture_id": "test case 2"
+      }
+    },
+    {
+      "model": "Claude Opus 4.8",
+      "task": "测试集 1",
+      "status": "pending"
+    },
+    {
+      "model": "Claude Opus 4.8",
+      "task": "测试集 2",
+      "status": "pending"
+    },
+    {
+      "model": "Claude Opus 4.8",
+      "task": "测试集 3",
+      "status": "pending"
+    }
+  ]
+}

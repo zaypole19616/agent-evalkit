@@ -1,0 +1,41 @@
+{
+  "batch_id": "报告 2",
+  "title": "报告 2",
+  "date": "2026-06-26",
+  "engine_version": "",
+  "judge": "",
+  "models": [
+    "Claude Fable 5",
+    "Claude Opus 4.8"
+  ],
+  "tasks": [
+    "测试集 1",
+    "测试集 2",
+    "测试集 3"
+  ],
+  "run_ids": {},
+  "reports": [
+    {
+      "type": "overview",
+      "file": "overview.md",
+      "title": "综合报告"
+    },
+    {
+      "type": "model",
+      "file": "model-1.md",
+      "title": "Claude Fable 5 报告",
+      "model": "Claude Fable 5"
+    },
+    {
+      "type": "model",
+      "file": "model-2.md",
+      "title": "Claude Opus 4.8 报告",
+      "model": "Claude Opus 4.8"
+    },
+    {
+      "type": "backlog",
+      "file": "backlog.md",
+      "title": "Bug Backlog"
+    }
+  ]
+}

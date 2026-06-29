@@ -1,0 +1,392 @@
+{
+  "version": 1,
+  "updated_at": "",
+  "tasks": {
+    "测试集 1": [
+      {
+        "model": "Claude Fable 5",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Opus 4.8",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GPT-5.5",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GPT 5.4",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Opus 4.6",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Gemini 3.5 Flash",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Sonnet 4.6",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GLM 5.2",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "DeepSeek V4 Pro",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      }
+    ],
+    "测试集 2": [
+      {
+        "model": "Claude Fable 5",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Opus 4.8",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GPT-5.5",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GPT 5.4",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Opus 4.6",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Gemini 3.5 Flash",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Sonnet 4.6",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GLM 5.2",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "DeepSeek V4 Pro",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      }
+    ],
+    "测试集 3": [
+      {
+        "model": "Claude Fable 5",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Opus 4.8",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GPT-5.5",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GPT 5.4",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Opus 4.6",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Gemini 3.5 Flash",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "Claude Sonnet 4.6",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "GLM 5.2",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      },
+      {
+        "model": "DeepSeek V4 Pro",
+        "score": null,
+        "token_median": 0,
+        "cost_median_usd": null,
+        "tested_at": "",
+        "run_id": "",
+        "report_path": "",
+        "stable": false,
+        "n_scored": 0,
+        "n_full": 3
+      }
+    ]
+  },
+  "global": [
+    {
+      "model": "Claude Fable 5",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "Claude Opus 4.8",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "GPT-5.5",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "GPT 5.4",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "Claude Opus 4.6",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "Gemini 3.5 Flash",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "Claude Sonnet 4.6",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "GLM 5.2",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    },
+    {
+      "model": "DeepSeek V4 Pro",
+      "weighted_score": null,
+      "tested_at": "",
+      "run_id": ""
+    }
+  ]
+}

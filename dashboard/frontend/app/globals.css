@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base — light shell. Body sits on slate-50; an ambient layer
+   defined in layout.tsx paints two soft radial gradients (cyan +
+   violet) so the page never feels sterile white. */
+html, body { @apply bg-surface-base text-slate-900; }
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { @apply bg-indigo-200/70 text-slate-900; }
+
+::-webkit-scrollbar { @apply w-2 h-2; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.65); }
+
+@layer components {
+  /* Floating panel surface — white card, soft border. */
+  .panel {
+    @apply bg-white/90 backdrop-blur border border-slate-200/80 rounded-xl;
+    box-shadow: 0 1px 0 0 rgba(15, 23, 42, 0.04), 0 8px 24px -16px rgba(15, 23, 42, 0.12);
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .panel-hover:hover {
+    @apply border-cyan-400/50;
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.06), 0 18px 38px -20px rgba(34, 211, 238, 0.35);
+    transform: translateY(-1px);
+  }
+
+  /* Inline chips for compact metadata: scoring scale, fixture count, tags. */
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-slate-200 bg-slate-100/80 text-slate-700 font-medium;
+  }
+  .chip-accent {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium
+           border border-indigo-200 bg-indigo-50 text-indigo-700;
+  }
+  .chip-violet {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium
+           border border-violet-200 bg-violet-50 text-violet-700;
+  }
+  .chip-cyan {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium
+           border border-cyan-200 bg-cyan-50 text-cyan-700;
+  }
+  .chip-emerald {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium
+           border border-emerald-200 bg-emerald-50 text-emerald-700;
+  }
+  .chip-rose {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium
+           border border-rose-200 bg-rose-50 text-rose-700;
+  }
+
+  .heading-gradient {
+    @apply bg-clip-text text-transparent bg-accent-gradient;
+  }
+
+  .section-eyebrow {
+    @apply text-[13px] uppercase tracking-wider text-slate-600 font-semibold;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium
+           bg-accent-gradient text-white shadow-glow-indigo
+           transition-transform duration-150 hover:scale-[1.02];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium
+           text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-900
+           transition-colors duration-150;
+  }
+}
+
+/* Markdown rubric rendering — light prose with explicit overrides so
+   headings/code/links read crisply on the panel surface. Body copy uses
+   slate-800 (one notch darker than the prose default) so the rubric
+   reads as real text instead of a faded note. Used by the benchmark
+   task detail page + run narrative/case diagnostics. */
+.prose-light {
+  @apply prose prose-sm max-w-none
+         prose-headings:font-semibold prose-headings:text-slate-900
+         prose-h1:text-xl prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-2
+         prose-h2:pb-1 prose-h2:border-b prose-h2:border-slate-200
+         prose-h3:text-base prose-h3:text-slate-900 prose-h3:mt-4
+         prose-p:text-slate-800 prose-p:leading-relaxed
+         prose-strong:text-slate-900 prose-strong:font-semibold
+         prose-em:text-slate-900
+         prose-li:my-1 prose-li:text-slate-800 prose-li:marker:text-slate-400
+         prose-ul:my-3 prose-ol:my-3
+         prose-code:text-indigo-700 prose-code:bg-slate-100
+         prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em]
+         prose-code:before:hidden prose-code:after:hidden
+         prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:text-indigo-700
+         prose-blockquote:border-l-indigo-300 prose-blockquote:text-slate-700
+         prose-hr:border-slate-200
+         prose-table:text-sm prose-th:text-slate-800 prose-th:border-slate-200
+         prose-td:border-slate-200 prose-td:text-slate-800;
+}
