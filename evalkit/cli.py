@@ -14,6 +14,7 @@ from pathlib import Path
 
 from . import leaderboard as lb_mod
 from .loader import discover_tasks, load_fixtures, load_manifest
+from .run_many import run_many
 from .runner import run_eval
 
 
@@ -32,6 +33,7 @@ def cmd_run(args) -> int:
         adapter_spec=args.adapter,
         tasks_filter=_tasks(args),
         resume=not args.no_resume,
+        resume_run_id=args.resume,
         judge_enabled=not args.no_judge,
         stable=args.stable,
     ))
@@ -39,6 +41,22 @@ def cmd_run(args) -> int:
     print(f"\n=== run {result['run_id']} ===")
     print(f"weighted: {g['weighted_score']}  verdict: {g['ship_verdict']}")
     print(f"leaderboard: {result['leaderboard_path']}")
+    return 0
+
+
+def cmd_run_many(args) -> int:
+    models = [m.strip() for m in args.models.split(",") if m.strip()]
+    if len(models) < 1:
+        print("--models must list at least one model")
+        return 1
+    result = asyncio.run(run_many(
+        root=_root(args),
+        models=models,
+        adapter_spec=args.adapter,
+        tasks_filter=_tasks(args),
+        judge_enabled=not args.no_judge,
+    ))
+    print(f"\n=== chain {result['chain_id']} === {len(result['models'])} models × {len(result['tasks'])} tasks")
     return 0
 
 
@@ -77,7 +95,9 @@ def main() -> None:
     run.add_argument("--model", required=True)
     run.add_argument("--adapter", default="openai_chat")
     run.add_argument("--tasks", default=None, help="comma-separated subset")
-    run.add_argument("--no-resume", action="store_true")
+    run.add_argument("--resume", default=None, metavar="RUN_ID",
+                     help="resume a prior run: reuse its run_id and skip fixtures that already have an artifact")
+    run.add_argument("--no-resume", action="store_true", help="re-run fixtures even if an artifact exists")
     run.add_argument("--no-judge", action="store_true", help="run + score structure only, skip the LLM judge")
     run.add_argument("--stable", action="store_true", help="mark this run as the baseline")
     run.set_defaults(fn=cmd_run)
@@ -87,6 +107,13 @@ def main() -> None:
     plan.add_argument("--adapter", default="openai_chat")
     plan.add_argument("--tasks", default=None)
     plan.set_defaults(fn=cmd_plan)
+
+    rm = sub.add_parser("run-many", help="evaluate a model × task matrix (feeds the dashboard Live view)")
+    rm.add_argument("--models", required=True, help="comma-separated model list")
+    rm.add_argument("--adapter", default="openai_chat")
+    rm.add_argument("--tasks", default=None, help="comma-separated subset")
+    rm.add_argument("--no-judge", action="store_true")
+    rm.set_defaults(fn=cmd_run_many)
 
     lb = sub.add_parser("leaderboard", help="render the current leaderboard")
     lb.set_defaults(fn=cmd_leaderboard)

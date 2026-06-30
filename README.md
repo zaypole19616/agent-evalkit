@@ -82,9 +82,13 @@ evalkit leaderboard
 export OPENAI_API_KEY=sk-...
 evalkit plan --model gpt-4o-mini      # list what would run, no calls
 evalkit run  --model gpt-4o-mini      # run + judge + score
+evalkit run  --model gpt-4o-mini --resume <run_id>   # resume a partial run
+
+# Evaluate several models (feeds the dashboard's Live matrix view):
+evalkit run-many --models gpt-4o-mini,gpt-4o
 ```
 
-Outputs land under the data root (`--root` or `$EVALKIT_DASHBOARD_ROOT`, default `.`) in exactly the layout the dashboard reads: `benchmarks/leaderboard.json`, `artifacts/benchmarks/<run_id>/…`, `reports/<run_id>/summary.json`.
+Outputs land under the data root (`--root` or `$EVALKIT_DASHBOARD_ROOT`, default `.`) in exactly the layout the dashboard reads: `benchmarks/leaderboard.json`, `artifacts/benchmarks/<run_id>/…`, `reports/<run_id>/{summary.json,narrative.md,diagnostics/}`, and `logs/run-many-<ts>/` for the Live view. The leaderboard's "weighted" column is an **equal-weight mean across tasks** (per-task weighting is reserved, not yet applied).
 
 ### 2. See it on the dashboard
 
@@ -161,6 +165,14 @@ agent-evalkit/
 ├─ demo/           synthetic demo-data generator
 └─ DESIGN.md       architecture deep-dive
 ```
+
+## ⚠️ Status & known limitations
+
+Alpha. Honest about what's not done yet:
+
+- **Frontend security**: pinned to Next.js `14.2.35` (clears the critical middleware-bypass CVE). A few `high` DoS/SSRF advisories are only fully resolved in Next 15.5.16+; a Next 15 migration is tracked but not done. The static-export deploy doesn't run a Next server, so most of those server-side surfaces don't apply there.
+- **Reserved config**: `scoring.aggregate` (median/weighted), `scoring.primary_metric`, and the `guard.*` thresholds are parsed but not yet wired — the score is an equal-weight mean and the ship verdict uses fixed thresholds.
+- **No CI / test suite yet**, and not published to PyPI. Contributions welcome.
 
 ## 📄 License
 

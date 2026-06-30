@@ -118,6 +118,11 @@ def aggregate_task(
 
 
 def global_summary(tasks: list[TaskSummary], baseline_global: float | None) -> GlobalSummary:
+    # ``weighted_score`` is an EQUAL-WEIGHT mean across tasks — per-task
+    # weighting is deferred (kept named "weighted" for forward-compat). The
+    # ``scoring.aggregate`` manifest field currently only wires "mean";
+    # median / weighted_mean are reserved. ``guard`` (drop/cost thresholds)
+    # is likewise reserved — ship-verdict thresholds are the constants above.
     if not tasks:
         return GlobalSummary(0.0, None, "DO_NOT_SHIP")
     weighted = sum(t.score for t in tasks) / len(tasks)

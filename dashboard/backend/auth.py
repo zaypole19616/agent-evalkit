@@ -179,3 +179,19 @@ def require_auth(request: Request) -> dict:
             headers={"WWW-Authenticate": "Bearer"},
         )
     return decode_jwt(token)
+
+
+def is_configured() -> bool:
+    """Auth is active only when both the Google client id and the JWT secret
+    are set. Otherwise the dashboard runs open (anonymous read-only)."""
+    return bool(google_client_id() and jwt_secret())
+
+
+def gate(request: Request) -> Optional[dict]:
+    """Router dependency: enforce auth ONLY when the server is configured for
+    it. Unconfigured (the default) → every endpoint is anonymous read-only.
+    Configured → a valid Bearer JWT is required, so data endpoints actually
+    respond 401 without one."""
+    if not is_configured():
+        return None
+    return require_auth(request)

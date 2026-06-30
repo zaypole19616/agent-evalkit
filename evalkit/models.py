@@ -30,6 +30,9 @@ class RuntimeConfig:
 
 @dataclass
 class ScoringConfig:
+    # NOTE: only ``judge_score`` + ``mean`` are wired today. ``primary_metric``
+    # and median/weighted aggregation are reserved for forward-compat (see
+    # scorer.global_summary). They're parsed but don't yet change scoring.
     primary_metric: str = "judge_score"
     aggregate: Literal["mean", "median"] = "mean"
 
@@ -49,10 +52,19 @@ class JudgeConfig:
     threshold_per_fixture: int = 3
     on_response: bool = True
     on_tool_trace: bool = True
+    # When the deliverable is a generated FILE (not the text response): the
+    # judge is shown each generated file's content (read from
+    # RunRecord.generated_files[].local_path). With expects_file=true, a
+    # fixture that produced no usable file is marked a delivery failure so a
+    # file-output rubric scores it 0 instead of judging the text/trace.
+    on_generated_files: bool = True
+    expects_file: bool = False
 
 
 @dataclass
 class GuardConfig:
+    # Reserved for future ship-gating. Parsed but not yet wired into the
+    # verdict (scorer uses fixed thresholds). Kept for forward-compat.
     drop_threshold_pct: int = 5
     cost_explosion_pct: int = 50
 

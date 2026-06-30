@@ -39,6 +39,10 @@ _TRANSIENT = {
 
 def _save_artifact(path: Path, *, manifest, fixture, model_id, record, elapsed_s) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    # The RunRecord fields are written at the TOP LEVEL (not nested under a
+    # "record" key) so the dashboard backend (dashboard/backend/cases.py) —
+    # which reads art.get("response_text"), art.get("tool_results"), etc. —
+    # sees them. The metadata keys below sit alongside.
     payload = {
         "task": manifest.name,
         "fixture_id": fixture.id,
@@ -47,7 +51,7 @@ def _save_artifact(path: Path, *, manifest, fixture, model_id, record, elapsed_s
         "expected_answer_intent": fixture.expected_answer_intent,
         "attached_files": list(fixture.files),
         "elapsed_s": elapsed_s,
-        "record": record.to_dict(),
+        **record.to_dict(),
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -83,7 +87,12 @@ async def run_task(
             outcome.completed += 1
             return
         async with sem:
-            for attempt in range(max(1, manifest.runtime.attempts) + 2):
+            # ``attempts`` is the max number of tries for this fixture. A
+            # transient (network) error retries until attempts is exhausted;
+            # a non-transient error or a timeout fails immediately (retrying
+            # them just burns time/credits).
+            max_tries = max(1, manifest.runtime.attempts)
+            for attempt in range(max_tries):
                 t0 = time.time()
                 try:
                     coro = adapter.run(manifest, f, f.model or model_id)
@@ -96,7 +105,7 @@ async def run_task(
                     outcome.errors.append((f.id, "TimeoutError"))
                     return
                 except Exception as e:
-                    if type(e).__name__ in _TRANSIENT and attempt < 2:
+                    if type(e).__name__ in _TRANSIENT and attempt < max_tries - 1:
                         await asyncio.sleep(2 * (attempt + 1))
                         continue
                     outcome.errors.append((f.id, f"{type(e).__name__}: {e}"))
