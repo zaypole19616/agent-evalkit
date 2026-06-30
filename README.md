@@ -1,41 +1,75 @@
-# agent-evalkit
+<div align="center">
 
-An open-source evaluation framework + dashboard for **AI agents that produce
-files and call tools** — the kind of work where a plain string-match test
-tells you nothing. Define a test set, run your agent over it, let an
-LLM-as-judge score each case against a rubric, and read the results on a
-leaderboard / per-test-set / report dashboard.
+# 🧪 agent-evalkit
 
-> **Status.** Both halves are runnable today: the **eval engine + CLI**
-> (`evalkit/` + `adapters/`) and the **dashboard** (`dashboard/`). See
-> [`DESIGN.md`](DESIGN.md) for the architecture and roadmap.
->
-> **Demo data is synthetic.** Everything shipped under
-> `dashboard/frontend/public/data/` is placeholder mock data — real model
-> names but blank ("—") scores, generic "测试集 1 / test case 1" test
-> content, and mock reports. Regenerate it any time with
-> `python demo/generate_demo_data.py`.
+**An open-source evaluation framework + dashboard for AI agents that produce files and call tools.**
 
-## What's here
+Define a test set → run your agent → let an LLM-as-judge score each case against a rubric → read it all on a leaderboard.
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
+![Dashboard: Next.js + FastAPI](https://img.shields.io/badge/dashboard-Next.js%20%2B%20FastAPI-black.svg)
+![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)
+
+</div>
+
+---
+
+A plain string-match test tells you nothing about an agent whose real answer is a generated spreadsheet, a multi-step tool trace, or a paragraph of reasoning. **agent-evalkit** evaluates exactly those: you write **one adapter** (`async def run(...) -> RunRecord`), and the framework handles loading test sets, running them concurrently, judging each result against a rubric, scoring, and surfacing everything on a dashboard.
+
+<p align="center">
+  <img src="docs/assets/leaderboard.png" width="100%" alt="agent-evalkit leaderboard — model ranking across tasks" />
+</p>
+
+> **Note** — the screenshots show the bundled **demo dataset, which is fully synthetic**: real public model names, but blank (`—`) scores and placeholder test sets / reports. Regenerate it any time with `python demo/generate_demo_data.py`, or replace it with your own results.
+
+## ✨ Why agent-evalkit
+
+- **One pluggable seam.** The framework only ever reads a `RunRecord`. Whether the result came from an OpenAI call, your local agent, or a remote product API is the adapter's business — not the framework's.
+- **Judge what actually matters.** LLM-as-judge against a per-task rubric, with the agent's response, tool trace, and generated files in view — not regex on a string.
+- **A dashboard, file-driven.** Leaderboard, live runs, test sets, model compare, and reports. One env var, no database. Ships a **static fallback** so it deploys with zero backend.
+- **Bring your own everything.** Your agent (adapter), your test sets (a folder of YAML + JSONL), your judge backend (any OpenAI-compatible endpoint).
+- **Self-host friendly.** MIT licensed, runs locally, deploys anywhere. No vendor, no telemetry.
+
+## 🖥️ The dashboard
+
+Five views, all rendered from the engine's output files (here, the synthetic demo):
+
+<table>
+  <tr>
+    <td width="50%"><strong>实时 · Live runs</strong><br/><img src="docs/assets/live.png" alt="Live model × task run matrix" /></td>
+    <td width="50%"><strong>测试集 · Test sets</strong><br/><img src="docs/assets/benchmarks.png" alt="Test set catalogue" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><strong>对比 · Compare</strong><br/><img src="docs/assets/compare.png" alt="Model comparison radar + score table" /></td>
+    <td width="50%"><strong>报告 · Reports</strong><br/><img src="docs/assets/report-detail.png" alt="Rendered evaluation report" /></td>
+  </tr>
+</table>
+
+## 🔄 How it works
+
+```mermaid
+flowchart LR
+  subgraph Engine["evalkit"]
+    direction LR
+    T["benchmarks/&lt;task&gt;<br/>manifest · fixtures · rubric"] --> L["loader"]
+    L --> P["pipeline<br/>concurrent · resumable"]
+    P --> R["RunRecord"]
+    R --> A["hard assertions"]
+    R --> J["LLM judge<br/>+ rubric"]
+    A --> S["scorer"]
+    J --> S
+    S --> O["leaderboard.json<br/>artifacts · summary"]
+  end
+  Y(["your agent / model"]) -. "adapter.run()" .-> P
+  O --> D["📊 Dashboard"]
 ```
-agent-evalkit/
-├─ evalkit/            # the eval engine (loader · judge · scorer · leaderboard · pipeline · CLI)
-├─ adapters/           # adapters: openai_chat (reference), mock (offline smoke test)
-├─ benchmarks/         # your test sets — one folder per task (example_qa is included)
-├─ dashboard/          # the eval dashboard
-│  ├─ frontend/        # Next.js — leaderboard / live / test sets / compare / reports
-│  └─ backend/         # FastAPI — file-driven API (one env var: EVALKIT_DASHBOARD_ROOT)
-├─ demo/               # synthetic demo-data generator (for the dashboard)
-├─ DESIGN.md           # full design (engine + adapter interface + roadmap)
-└─ README.md
-```
 
-## Run an eval (CLI)
+Only the adapter step is system-specific. Everything else — loading, judging, scoring, the leaderboard — is reused as-is.
 
-The framework runs a fixture through an **adapter** (you implement one
-`async def run(...) -> RunRecord`), scores each result with an
-LLM-as-judge against the task's rubric, and writes a leaderboard.
+## 🚀 Quickstart
+
+### 1. Run an eval (CLI)
 
 ```bash
 pip install -e .          # installs the `evalkit` command + deps
@@ -46,18 +80,25 @@ evalkit leaderboard
 
 # Real run against any OpenAI-compatible endpoint:
 export OPENAI_API_KEY=sk-...
-evalkit plan --model gpt-4o-mini                 # list what would run, no calls
-evalkit run  --model gpt-4o-mini                 # run + judge + score
+evalkit plan --model gpt-4o-mini      # list what would run, no calls
+evalkit run  --model gpt-4o-mini      # run + judge + score
 ```
 
-Outputs land under the data root (`--root` or `$EVALKIT_DASHBOARD_ROOT`,
-default `.`) in exactly the layout the dashboard reads:
-`benchmarks/leaderboard.json`, `artifacts/benchmarks/<run_id>/…`,
-`reports/<run_id>/summary.json`. Point the dashboard backend at the same
-root to see your run, or copy those files into
-`dashboard/frontend/public/data/` for a static deploy.
+Outputs land under the data root (`--root` or `$EVALKIT_DASHBOARD_ROOT`, default `.`) in exactly the layout the dashboard reads: `benchmarks/leaderboard.json`, `artifacts/benchmarks/<run_id>/…`, `reports/<run_id>/summary.json`.
 
-### Write an adapter
+### 2. See it on the dashboard
+
+```bash
+cd dashboard/frontend
+pnpm install
+pnpm dev                  # http://localhost:3001
+```
+
+With no backend running, the dashboard serves the bundled static demo. To show *your* run, either copy your output files into `public/data/`, or run the backend (below).
+
+## 🧩 Write an adapter
+
+The only thing you implement. Take a fixture, return a `RunRecord`:
 
 ```python
 # mypkg/my_adapter.py
@@ -65,8 +106,8 @@ from evalkit.record import RunRecord
 
 class MyAdapter:
     async def run(self, manifest, fixture, model_id) -> RunRecord:
-        answer = await my_agent(fixture.prompt, files=fixture.files)
-        return RunRecord(request_id=fixture.id, response_text=answer.text)
+        result = await my_agent(fixture.prompt, files=fixture.files)
+        return RunRecord(request_id=fixture.id, response_text=result.text)
         # also fill tool_results / generated_files for tool- and file-tasks
 ```
 
@@ -74,85 +115,53 @@ class MyAdapter:
 evalkit run --adapter mypkg.my_adapter:MyAdapter --model my-agent
 ```
 
-### Add a test set
+Built-in reference adapters: **`openai_chat`** (any OpenAI-compatible endpoint) and **`mock`** (offline smoke test).
 
-A task is a folder under `benchmarks/<name>/` with `manifest.yaml`,
-`fixtures.jsonl`, and `rubric.md` (+ optional `files/`). See
-[`benchmarks/example_qa/`](benchmarks/example_qa/) for the shape.
+## 📚 Add a test set
 
-The dashboard reads everything from a single data root and has **two
-runtime modes**: a pure-static build (no backend) and a live backend that
-serves your own evaluation artifacts. Pick whichever fits your deploy.
+A task is a folder under `benchmarks/<name>/`:
 
-## Run the dashboard
+```
+manifest.yaml    metadata + runtime + scoring + assertions + judge config
+fixtures.jsonl   one JSON object per line — the test cases
+rubric.md        scoring guide injected into the judge prompt
+files/           optional attachments referenced by fixtures[*].files
+```
 
-### Option A — static (no backend)
+See [`benchmarks/example_qa/`](benchmarks/example_qa/) for a runnable example.
 
-The frontend ships a static fallback: with no backend reachable it reads
-the bundled JSON under `public/data/`. Best for a public demo or any
-read-only deploy.
+## 🌐 Deploy your own
+
+**Static (no backend)** — best for a public, read-only dashboard:
 
 ```bash
-cd dashboard/frontend
-pnpm install
-pnpm build            # static export → dashboard/frontend/out/
-npx serve out         # or copy out/ to nginx / Caddy / any static host
+cd dashboard/frontend && pnpm install && pnpm build   # → out/
+npx serve out                                          # or any static host
 ```
 
-Open the printed URL. To show *your* data instead of the demo, replace the
-files under `public/data/` (same shape as the generator emits) before
-`pnpm build`.
-
-### Option B — live backend (serve your own eval artifacts)
-
-Run the FastAPI backend pointed at a data root laid out like:
-
-```
-<root>/benchmarks/leaderboard.json
-<root>/benchmarks/<task>/{fixtures.jsonl,rubric.md,files/}
-<root>/reports/<run_id>/{summary.json,narrative.md}
-<root>/artifacts/benchmarks/<run_id>/<task>/<fixture>.json
-<root>/logs/run-many-<ts>/{plan.json,status.jsonl}
-```
+**Live backend** — serve your own evaluation artifacts:
 
 ```bash
-# backend
 pip install -r dashboard/backend/requirements.txt
-EVALKIT_DASHBOARD_ROOT=/path/to/your/eval-data \
+EVALKIT_DASHBOARD_ROOT=/path/to/eval-data \
   uvicorn dashboard.backend.routes:build_app --factory --port 8000
-
-# frontend (dev mode proxies /api/dashboard → :8000)
-cd dashboard/frontend && pnpm install && pnpm dev   # http://localhost:3001
+# then run the frontend in dev mode; it auto-detects the backend
 ```
 
-The frontend auto-detects the backend; if it's up you get live data, if
-not it falls back to the static bundle.
+Auth is **off by default** (anonymous read-only). To gate a private deploy, set `DASHBOARD_GOOGLE_CLIENT_ID` + `DASHBOARD_JWT_SECRET` (optional `DASHBOARD_ALLOWED_DOMAINS` / `DASHBOARD_ALLOWED_EMAILS`).
 
-## Auth (optional)
+## 🗂️ Project layout
 
-The dashboard runs **fully open** by default. To gate a private deploy, set
-Google sign-in env vars on the backend:
-
-```bash
-DASHBOARD_GOOGLE_CLIENT_ID=<your-oauth-client-id>
-DASHBOARD_JWT_SECRET=<random-secret>
-# optional allowlists (empty = any verified Google account):
-DASHBOARD_ALLOWED_DOMAINS=example.com
-DASHBOARD_ALLOWED_EMAILS=alice@example.com
+```
+agent-evalkit/
+├─ evalkit/        engine: loader · judge · scorer · leaderboard · pipeline · CLI
+├─ adapters/       openai_chat (reference) · mock (offline)
+├─ benchmarks/     your test sets — one folder per task (example_qa included)
+├─ dashboard/      Next.js frontend + FastAPI backend (file-driven)
+├─ demo/           synthetic demo-data generator
+└─ DESIGN.md       architecture deep-dive
 ```
 
-With `DASHBOARD_GOOGLE_CLIENT_ID` unset, auth is off and every page is
-anonymous read-only.
+## 📄 License
 
-## Regenerate the demo data
-
-```bash
-python demo/generate_demo_data.py
-```
-
-Edit `demo/generate_demo_data.py` to change the model roster, test sets,
-test cases, reports, or live snapshot.
-
-## License
-
-MIT — see [`LICENSE`](LICENSE).
+[MIT](LICENSE).
