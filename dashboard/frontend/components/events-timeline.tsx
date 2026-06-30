@@ -1,7 +1,10 @@
 'use client'
 
+import { useT } from '@/lib/i18n'
+
 export function EventsTimeline({ events }: { events: Array<{ event: string; t_ms: number }> }) {
-  if (!events || events.length === 0) return <p className="text-sm text-slate-700">无事件记录。</p>
+  const t = useT()
+  if (!events || events.length === 0) return <p className="text-sm text-slate-700">{t('无事件记录。', 'No events recorded.')}</p>
   return (
     <ol className="text-sm font-mono space-y-1 panel p-4">
       {events.map((e, i) => (

@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import { useLang, useT } from '@/lib/i18n'
 
 const NAV_LINKS = [
   {
     href: '/leaderboard',
-    label: '总榜',
+    label: ['总榜', 'Leaderboard'] as const,
     isActive: (pathname: string) =>
       pathname.startsWith('/leaderboard') ||
       pathname.startsWith('/runs') ||
@@ -15,22 +16,22 @@ const NAV_LINKS = [
   },
   {
     href: '/live',
-    label: '实时',
+    label: ['实时', 'Live'] as const,
     isActive: (pathname: string) => pathname.startsWith('/live'),
   },
   {
     href: '/benchmarks',
-    label: '测试集',
+    label: ['测试集', 'Test sets'] as const,
     isActive: (pathname: string) => pathname.startsWith('/benchmarks'),
   },
   {
     href: '/compare',
-    label: '对比',
+    label: ['对比', 'Compare'] as const,
     isActive: (pathname: string) => pathname.startsWith('/compare'),
   },
   {
     href: '/reports',
-    label: '报告',
+    label: ['报告', 'Reports'] as const,
     isActive: (pathname: string) => pathname.startsWith('/reports'),
   },
 ]
@@ -38,6 +39,8 @@ const NAV_LINKS = [
 export function Nav() {
   const pathname = usePathname()
   const { enabled, user, signOut } = useAuth()
+  const { lang, setLang } = useLang()
+  const t = useT()
 
   // /login is a full-bleed marketing-style page — the chrome would
   // compete with the centered card. Skip the nav entirely there.
@@ -65,7 +68,7 @@ export function Nav() {
                 active ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              {label}
+              {t(label[0], label[1])}
               {active && (
                 <span
                   aria-hidden
@@ -78,6 +81,13 @@ export function Nav() {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
+        <button
+          onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+          className="text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 rounded-md px-2 py-1"
+          title={t('切换语言', 'Switch language')}
+        >
+          {lang === 'zh' ? 'EN' : '中'}
+        </button>
         {enabled && user && (
           <>
             <span className="hidden sm:inline-flex items-center gap-2 text-xs text-slate-600">
@@ -87,9 +97,9 @@ export function Nav() {
             <button
               onClick={signOut}
               className="text-xs text-slate-500 hover:text-slate-900 transition-colors"
-              title="退出登录"
+              title={t('退出登录', 'Sign out')}
             >
-              退出
+              {t('退出', 'Sign out')}
             </button>
           </>
         )}

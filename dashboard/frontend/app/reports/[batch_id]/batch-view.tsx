@@ -6,16 +6,19 @@ import { useState } from 'react'
 import { api } from '@/lib/api-client'
 import { useRouteId } from '@/lib/use-route-id'
 import { NarrativeRenderer } from '@/components/narrative-renderer'
+import { useT } from '@/lib/i18n'
 import type { ReportEntry } from '@/lib/types'
 
-const GROUP_LABEL: Record<ReportEntry['type'], string> = {
-  overview: '综合',
-  model: '逐模型',
-  backlog: 'Bug Backlog',
-}
 const GROUP_ORDER: ReportEntry['type'][] = ['overview', 'model', 'backlog']
 
 export default function BatchView() {
+  const t = useT()
+  const groupLabel = (type: ReportEntry['type']) =>
+    type === 'overview'
+      ? t('综合', 'Overview')
+      : type === 'model'
+        ? t('逐模型', 'Per-model')
+        : t('Bug Backlog', 'Bug Backlog')
   const batchId = useRouteId('batch_id')
   const { data: manifest, error } = useSWR(
     batchId ? `report-manifest-${batchId}` : null,
@@ -23,8 +26,8 @@ export default function BatchView() {
   )
   const [selected, setSelected] = useState<string | null>(null)
 
-  if (error) return <p className="text-rose-400">无法加载报告：{String(error)}</p>
-  if (!manifest) return <p className="text-slate-700">加载中…</p>
+  if (error) return <p className="text-rose-400">{t('无法加载报告：', 'Couldn’t load this report: ')}{String(error)}</p>
+  if (!manifest) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
 
   // Default to the overview (or the first report) until the user picks one.
   const current =
@@ -40,7 +43,7 @@ export default function BatchView() {
   return (
     <div className="animate-fade-in">
       <header className="mb-5">
-        <Link href="/reports" className="text-xs text-slate-500 hover:text-slate-900">← 全部报告</Link>
+        <Link href="/reports" className="text-xs text-slate-500 hover:text-slate-900">← {t('全部报告', 'All reports')}</Link>
         <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mt-1">{manifest.title}</h1>
         <div className="flex flex-wrap gap-1.5 mt-2">
           <span className="chip">{manifest.date}</span>
@@ -54,7 +57,7 @@ export default function BatchView() {
         <aside className="space-y-4">
           {groups.map((g) => (
             <div key={g.type}>
-              <div className="section-eyebrow text-slate-500 mb-1.5">{GROUP_LABEL[g.type]}</div>
+              <div className="section-eyebrow text-slate-500 mb-1.5">{groupLabel(g.type)}</div>
               <div className="flex flex-col gap-0.5">
                 {g.items.map((r) => {
                   const active = r.file === current
@@ -77,7 +80,7 @@ export default function BatchView() {
 
         {/* Rendered markdown */}
         <main className="panel p-6 min-w-0">
-          {current ? <ReportBody batchId={batchId} file={current} /> : <p className="text-slate-500">没有报告。</p>}
+          {current ? <ReportBody batchId={batchId} file={current} /> : <p className="text-slate-500">{t('没有报告。', 'No report.')}</p>}
         </main>
       </div>
     </div>
@@ -85,8 +88,9 @@ export default function BatchView() {
 }
 
 function ReportBody({ batchId, file }: { batchId: string; file: string }) {
+  const t = useT()
   const { data, error } = useSWR(`report-md-${batchId}-${file}`, () => api.reportMarkdown(batchId, file))
-  if (error) return <p className="text-rose-400">无法加载该报告：{String(error)}</p>
-  if (!data) return <p className="text-slate-700">加载中…</p>
+  if (error) return <p className="text-rose-400">{t('无法加载该报告：', 'Couldn’t load this report: ')}{String(error)}</p>
+  if (!data) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
   return <NarrativeRenderer markdown={data.markdown} />
 }

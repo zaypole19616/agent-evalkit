@@ -7,46 +7,46 @@
       "Claude Opus 4.8"
     ],
     "tasks": [
-      "测试集 1",
-      "测试集 2",
-      "测试集 3"
+      "Test set 1",
+      "Test set 2",
+      "Test set 3"
     ],
     "cell_count": 6,
     "avg_score": null,
     "cells": [
       {
         "model": "Claude Fable 5",
-        "task": "测试集 1",
+        "task": "Test set 1",
         "score": null,
         "run_id": ""
       },
       {
         "model": "Claude Fable 5",
-        "task": "测试集 2",
+        "task": "Test set 2",
         "score": null,
         "run_id": ""
       },
       {
         "model": "Claude Fable 5",
-        "task": "测试集 3",
+        "task": "Test set 3",
         "score": null,
         "run_id": ""
       },
       {
         "model": "Claude Opus 4.8",
-        "task": "测试集 1",
+        "task": "Test set 1",
         "score": null,
         "run_id": ""
       },
       {
         "model": "Claude Opus 4.8",
-        "task": "测试集 2",
+        "task": "Test set 2",
         "score": null,
         "run_id": ""
       },
       {
         "model": "Claude Opus 4.8",
-        "task": "测试集 3",
+        "task": "Test set 3",
         "score": null,
         "run_id": ""
       }

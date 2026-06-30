@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { api } from '@/lib/api-client'
 import { taskLabel } from '@/lib/task-meta'
 import { modelDisplayName } from '@/lib/model-meta'
+import { useT } from '@/lib/i18n'
 import type { ChainHistoryItem } from '@/lib/types'
 
 function scoreClass(s: number | null): string {
@@ -29,6 +30,7 @@ function dateRange(item: ChainHistoryItem): string {
 }
 
 export function RunHistory() {
+  const t = useT()
   const { data, error } = useSWR('history', () => api.history())
   const [open, setOpen] = useState<Set<number>>(new Set([0])) // newest expanded by default
 
@@ -45,9 +47,9 @@ export function RunHistory() {
   return (
     <section className="space-y-3">
       <div className="flex items-center gap-3">
-        <h2 className="section-eyebrow text-slate-500">历史记录</h2>
+        <h2 className="section-eyebrow text-slate-500">{t('历史记录', 'History')}</h2>
         <span className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
-        <span className="text-[11px] text-slate-500 font-mono">{data.length} 次</span>
+        <span className="text-[11px] text-slate-500 font-mono">{data.length} {t('次', 'runs')}</span>
       </div>
 
       {data.map((item, i) => {
@@ -61,11 +63,11 @@ export function RunHistory() {
               <span aria-hidden className={`text-slate-400 transition-transform ${expanded ? 'rotate-90' : ''}`}>▶</span>
               <span className="font-medium text-slate-900 text-sm">{dateRange(item)}</span>
               <span className="text-xs text-slate-500">
-                {item.models.length} 模型 × {item.tasks.length} 任务 · {item.cell_count} cell
+                {item.models.length} {t('模型', 'models')} × {item.tasks.length} {t('任务', 'tasks')} · {item.cell_count} cell
               </span>
               {item.avg_score != null && (
                 <span className={`ml-auto text-sm font-mono ${scoreClass(item.avg_score)}`}>
-                  均分 {item.avg_score.toFixed(2)}
+                  {t('均分', 'avg')} {item.avg_score.toFixed(2)}
                 </span>
               )}
             </button>
@@ -79,13 +81,14 @@ export function RunHistory() {
 }
 
 function HistoryMatrix({ item }: { item: ChainHistoryItem }) {
+  const t = useT()
   const byKey = new Map(item.cells.map((c) => [`${c.model}::${c.task}`, c]))
   return (
     <div className="overflow-x-auto border-t border-slate-100">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="text-[11px] text-slate-500">
-            <th className="text-left font-medium px-4 py-2 sticky left-0 bg-white">模型</th>
+            <th className="text-left font-medium px-4 py-2 sticky left-0 bg-white">{t('模型', 'Model')}</th>
             {item.tasks.map((t) => (
               <th key={t} className="px-3 py-2 font-medium whitespace-nowrap" title={t}>{taskLabel(t)}</th>
             ))}

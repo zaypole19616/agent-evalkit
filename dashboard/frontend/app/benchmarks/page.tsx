@@ -3,19 +3,21 @@
 import Link from 'next/link'
 import useSWR from 'swr'
 import { api } from '@/lib/api-client'
-import { taskLabel, taskDescription, taskScoringScale, groupTasksByCategory, TASK_CATEGORIES } from '@/lib/task-meta'
+import { taskLabel, taskDescription, taskScoringScale, groupTasksByCategory, TASK_CATEGORIES, categoryLabel } from '@/lib/task-meta'
+import { useT } from '@/lib/i18n'
 
 // Category-level accent — picked once and reused for every card in
 // that group so the eye groups them automatically.
 const CATEGORY_ACCENT: Record<string, { eyebrow: string; dot: string; ring: string }> = {
-  生成类: { eyebrow: 'text-violet-700', dot: 'bg-violet-400', ring: 'hover:shadow-glow-violet' },
-  检索类: { eyebrow: 'text-indigo-700', dot: 'bg-cyan-400', ring: 'hover:shadow-glow-cyan' },
+  'Task type 1': { eyebrow: 'text-violet-700', dot: 'bg-violet-400', ring: 'hover:shadow-glow-violet' },
+  'Task type 2': { eyebrow: 'text-indigo-700', dot: 'bg-cyan-400', ring: 'hover:shadow-glow-cyan' },
 }
 
 export default function BenchmarksIndex() {
+  const t = useT()
   const { data, error } = useSWR('benchmarks', () => api.benchmarks())
-  if (error) return <p className="text-rose-400">暂时无法加载测试集：{String(error)}</p>
-  if (!data) return <p className="text-slate-700">加载中…</p>
+  if (error) return <p className="text-rose-400">{t('暂时无法加载测试集：', 'Unable to load test sets: ')}{String(error)}</p>
+  if (!data) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
 
   const taskKeys = data.map((b) => b.task)
   const byKey = Object.fromEntries(data.map((b) => [b.task, b]))
@@ -26,20 +28,20 @@ export default function BenchmarksIndex() {
     <div className="space-y-10 animate-fade-in">
       <header>
         <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">
-          <span className="heading-gradient">测试集</span>目录
+          <span className="heading-gradient">{t('测试集', 'Test sets')}</span>{t('目录', '')}
         </h1>
         <p className="text-sm text-slate-700 mt-2">
-          共 {data.length} 个任务 · {totalFixtures} 个测试用例 · 覆盖 {Object.keys(TASK_CATEGORIES).length} 个能力维度
+          {t('共', '')} {data.length} {t('个任务', 'tasks')} · {totalFixtures} {t('个测试用例', 'test cases')} · {t('覆盖', 'covering')} {Object.keys(TASK_CATEGORIES).length} {t('个能力维度', 'capability dimensions')}
         </p>
       </header>
 
       {groups.map(({ category, tasks }) => {
-        const accent = CATEGORY_ACCENT[category] ?? CATEGORY_ACCENT['生成类']
+        const accent = CATEGORY_ACCENT[category] ?? CATEGORY_ACCENT['Task type 1']
         return (
           <section key={category}>
             <div className="flex items-center gap-3 mb-4">
               <span className={`inline-block w-1.5 h-1.5 rounded-full ${accent.dot} shadow-glow-cyan`} />
-              <h2 className={`section-eyebrow ${accent.eyebrow}`}>{category}</h2>
+              <h2 className={`section-eyebrow ${accent.eyebrow}`}>{categoryLabel(category, t)}</h2>
               <span className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent" />
               <span className="text-[11px] text-slate-500 font-mono">{tasks.length} tasks</span>
             </div>
@@ -67,13 +69,13 @@ export default function BenchmarksIndex() {
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 mb-3">
-                      <span className="chip">{b.fixture_count} 用例</span>
-                      {b.has_files && <span className="chip">含附件</span>}
+                      <span className="chip">{b.fixture_count} {t('用例', 'cases')}</span>
+                      {b.has_files && <span className="chip">{t('含附件', 'Attachments')}</span>}
                       {scale && <span className="chip-violet">{scale}</span>}
                     </div>
 
                     <p className="text-sm text-slate-700 line-clamp-4 leading-relaxed">
-                      {taskDescription(b.task) || '暂无任务描述'}
+                      {taskDescription(b.task) || t('暂无任务描述', 'No description')}
                     </p>
                   </Link>
                 )

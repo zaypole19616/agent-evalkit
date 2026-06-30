@@ -1,6 +1,6 @@
 {
-  "batch_id": "报告 1",
-  "title": "报告 1",
+  "batch_id": "Report 1",
+  "title": "Report 1",
   "date": "2026-06-26",
   "engine_version": "",
   "judge": "",
@@ -9,27 +9,27 @@
     "Claude Opus 4.8"
   ],
   "tasks": [
-    "测试集 1",
-    "测试集 2",
-    "测试集 3"
+    "Test set 1",
+    "Test set 2",
+    "Test set 3"
   ],
   "run_ids": {},
   "reports": [
     {
       "type": "overview",
       "file": "overview.md",
-      "title": "综合报告"
+      "title": "Overview"
     },
     {
       "type": "model",
       "file": "model-1.md",
-      "title": "Claude Fable 5 报告",
+      "title": "Claude Fable 5 report",
       "model": "Claude Fable 5"
     },
     {
       "type": "model",
       "file": "model-2.md",
-      "title": "Claude Opus 4.8 报告",
+      "title": "Claude Opus 4.8 report",
       "model": "Claude Opus 4.8"
     },
     {

@@ -9,31 +9,33 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Legend,
 } from 'recharts'
-import { taskLabel, groupTasksByCategory } from '@/lib/task-meta'
+import { taskLabel, groupTasksByCategory, categoryLabel } from '@/lib/task-meta'
 import { modelDisplayName } from '@/lib/model-meta'
 import { OutwardTick } from '@/components/radar-tick'
+import { useT } from '@/lib/i18n'
 
 // Cycle through high-contrast accent colors. First three are tuned
 // to play nicely against the slate-900 panel background.
 const COLORS = ['#22d3ee', '#a855f7', '#f59e0b', '#10b981', '#ec4899', '#6366f1']
 
 function ComparePageInner() {
+  const t = useT()
   const search = useSearchParams()
   const modelsParam = search.get('models') ?? ''
   const models = modelsParam.split(',').map((s) => s.trim()).filter(Boolean)
 
   const { data, isLoading } = useSWR('leaderboard', () => api.leaderboard())
-  if (isLoading) return <p className="text-slate-700">加载中…</p>
+  if (isLoading) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
   if (!data) return null
 
   if (models.length === 0) {
     return (
       <div className="space-y-3 animate-fade-in">
         <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">
-          模型<span className="heading-gradient">对比</span>
+          {t('模型', 'Model ')}<span className="heading-gradient">{t('对比', 'Comparison')}</span>
         </h1>
         <p className="text-sm text-slate-700">
-          未选中任何模型。回到 <Link href="/leaderboard" className="text-indigo-600 hover:text-indigo-700 transition-colors">总榜</Link> 勾选 2–3 个后再来。
+          {t('未选中任何模型。', 'No models selected. ')}{t('回到', 'Back to')} <Link href="/leaderboard" className="text-indigo-600 hover:text-indigo-700 transition-colors">{t('总榜', 'Leaderboard')}</Link> {t('勾选', 'select')} 2–3 {t('个后再来。', 'then return.')}
         </p>
       </div>
     )
@@ -76,18 +78,18 @@ function ComparePageInner() {
           href="/leaderboard"
           className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-700 transition-colors mb-3"
         >
-          <span aria-hidden>←</span> 总榜
+          <span aria-hidden>←</span> {t('总榜', 'Leaderboard')}
         </Link>
         <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">
-          模型<span className="heading-gradient">对比</span>
+          {t('模型', 'Model ')}<span className="heading-gradient">{t('对比', 'Comparison')}</span>
         </h1>
         <p className="text-sm text-slate-700 mt-2">
-          {rows.length} 个模型 · 每个 task 取该 model 最新 run 的分数
+          {rows.length} {t('个模型', 'models')} · {t('每个 task 取该 model 最新 run 的分数', "score = each model's latest run per task")}
         </p>
       </header>
 
       <section className="panel p-5">
-        <h2 className="section-eyebrow mb-3">叠加雷达</h2>
+        <h2 className="section-eyebrow mb-3">{t('叠加雷达', 'Overlay radar')}</h2>
         <div className="w-full h-96">
           <ResponsiveContainer>
             <RadarChart data={radarData} outerRadius="65%" margin={{ top: 28, right: 70, bottom: 32, left: 70 }}>
@@ -116,23 +118,23 @@ function ComparePageInner() {
       </section>
 
       <section>
-        <h2 className="section-eyebrow mb-3">分数表</h2>
+        <h2 className="section-eyebrow mb-3">{t('分数表', 'Score table')}</h2>
         <div className="panel overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider">
-                <th rowSpan={2} className="text-left p-3 align-bottom border-b border-slate-200">模型</th>
-                <th rowSpan={2} className="text-right p-3 align-bottom border-b border-slate-200">加权</th>
+                <th rowSpan={2} className="text-left p-3 align-bottom border-b border-slate-200">{t('模型', 'Model')}</th>
+                <th rowSpan={2} className="text-right p-3 align-bottom border-b border-slate-200">{t('加权', 'Weighted')}</th>
                 {groups.map((g) => (
                   <th
                     key={g.category}
                     colSpan={g.tasks.length}
                     className="text-center p-2.5 border-b border-slate-200 border-l border-slate-200"
                   >
-                    {g.category}
+                    {categoryLabel(g.category, t)}
                   </th>
                 ))}
-                <th rowSpan={2} className="text-left p-3 align-bottom border-b border-slate-200 border-l border-slate-200">最新测试</th>
+                <th rowSpan={2} className="text-left p-3 align-bottom border-b border-slate-200 border-l border-slate-200">{t('最新测试', 'Last tested')}</th>
               </tr>
               <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider">
                 {groups.map((g) =>
@@ -193,9 +195,14 @@ function ComparePageInner() {
   )
 }
 
+function CompareFallback() {
+  const t = useT()
+  return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
+}
+
 export default function ComparePage() {
   return (
-    <Suspense fallback={<p className="text-slate-700">加载中…</p>}>
+    <Suspense fallback={<CompareFallback />}>
       <ComparePageInner />
     </Suspense>
   )

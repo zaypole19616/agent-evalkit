@@ -12,6 +12,7 @@ import useSWR from 'swr'
 import { api } from '@/lib/api-client'
 import { taskLabel, groupTasksByCategory } from '@/lib/task-meta'
 import { modelDisplayName } from '@/lib/model-meta'
+import { useT } from '@/lib/i18n'
 import type { LiveCell, LiveStatus } from '@/lib/types'
 
 // Sort task slugs into the canonical 生成类→检索类 order so the chain
@@ -22,27 +23,30 @@ function orderTasks(tasks: string[]): string[] {
 }
 
 export function LiveProgress() {
+  const t = useT()
   const { data, error } = useSWR<LiveStatus>('live', () => api.live(), { refreshInterval: 5000 })
-  if (error) return <p className="text-sm text-slate-700">暂时无法加载实时状态，请稍后刷新。</p>
-  if (!data) return <p className="text-slate-700">加载中…</p>
+  if (error) return <p className="text-sm text-slate-700">{t('暂时无法加载实时状态，请稍后刷新。', 'Unable to load live status, please refresh later.')}</p>
+  if (!data) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
   if (data.mode === 'chain') return <ChainView data={data} />
   if (data.mode === 'single') return <SingleView data={data} />
   return <IdleView />
 }
 
 function IdleView() {
+  const t = useT()
   return (
     <div className="panel p-10 text-center">
       <div className="inline-flex items-center gap-2 text-slate-700 text-sm">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-500" />
-        当前没有正在跑的测试
+        {t('当前没有正在跑的测试', 'Nothing running right now')}
       </div>
-      <p className="text-xs text-slate-500 mt-2">触发一条 chain 后这里会自动渲染矩阵</p>
+      <p className="text-xs text-slate-500 mt-2">{t('触发一条 chain 后这里会自动渲染矩阵', 'trigger a chain and the matrix renders here')}</p>
     </div>
   )
 }
 
 function ChainView({ data }: { data: Extract<LiveStatus, { mode: 'chain' }> }) {
+  const t = useT()
   const cellMap = new Map<string, LiveCell>()
   for (const c of data.cells) cellMap.set(`${c.model}::${c.task}`, c)
   // Canonical column order — match /models/<X>/ history regardless of
@@ -57,13 +61,13 @@ function ChainView({ data }: { data: Extract<LiveStatus, { mode: 'chain' }> }) {
       <div className="panel p-5 space-y-3">
         <div className="flex items-center gap-3 flex-wrap">
           {data.finished ? (
-            <span className="chip-emerald">已完成</span>
+            <span className="chip-emerald">{t('已完成', 'Done')}</span>
           ) : (
             <span className="chip-cyan inline-flex items-center gap-1.5">
               <span className="relative inline-flex w-2 h-2">
                 <span className="absolute inset-0 rounded-full bg-cyan-400 animate-pulse-soft" />
               </span>
-              进行中
+              {t('进行中', 'In progress')}
             </span>
           )}
           <span className="font-mono text-xs text-slate-700">{data.chain_id}</span>
@@ -97,7 +101,7 @@ function ChainView({ data }: { data: Extract<LiveStatus, { mode: 'chain' }> }) {
 
         {!data.has_plan && (
           <p className="text-xs text-amber-700/90 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-            这条 chain 启动时 runner 还没写 plan.json，无法枚举 pending cells；只展示已完成 + 当前运行中。下次新启 chain 即可看到完整矩阵。
+            {t('这条 chain 启动时 runner 还没写 plan.json，无法枚举 pending cells；只展示已完成 + 当前运行中。下次新启 chain 即可看到完整矩阵。', 'When this chain started the runner had not written plan.json yet, so pending cells cannot be enumerated; only done + currently running are shown. Start a new chain to see the full matrix.')}
           </p>
         )}
       </div>
@@ -106,7 +110,7 @@ function ChainView({ data }: { data: Extract<LiveStatus, { mode: 'chain' }> }) {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider">
-              <th className="text-left p-3 sticky left-0 bg-white/95 backdrop-blur whitespace-nowrap z-10">模型</th>
+              <th className="text-left p-3 sticky left-0 bg-white/95 backdrop-blur whitespace-nowrap z-10">{t('模型', 'Model')}</th>
               {orderedTasks.map((t) => (
                 <th key={t} className="text-center p-3 whitespace-nowrap font-medium">
                   {taskLabel(t)}
@@ -132,10 +136,10 @@ function ChainView({ data }: { data: Extract<LiveStatus, { mode: 'chain' }> }) {
       </div>
 
       <div className="flex gap-4 text-xs text-slate-700 flex-wrap pt-1">
-        <Legend dot="bg-emerald-400 shadow-glow-emerald" label="已完成 · 分数" />
-        <Legend dot="bg-cyan-400 shadow-glow-cyan animate-pulse-soft" label="运行中 · done/total" />
-        <Legend dot="bg-slate-500" label="待跑" />
-        <Legend dot="bg-rose-400" label="失败 / 超时" />
+        <Legend dot="bg-emerald-400 shadow-glow-emerald" label={t('已完成 · 分数', 'Done · score')} />
+        <Legend dot="bg-cyan-400 shadow-glow-cyan animate-pulse-soft" label={t('运行中 · done/total', 'Running · done/total')} />
+        <Legend dot="bg-slate-500" label={t('待跑', 'Pending')} />
+        <Legend dot="bg-rose-400" label={t('失败 / 超时', 'Failed / Timeout')} />
       </div>
     </div>
   )
@@ -160,6 +164,7 @@ function Legend({ dot, label }: { dot: string; label: string }) {
 }
 
 function CellTile({ cell }: { cell: LiveCell | undefined }) {
+  const t = useT()
   if (!cell) return <div className="text-center text-xs text-slate-700">—</div>
 
   if (cell.status === 'done') {
@@ -199,7 +204,7 @@ function CellTile({ cell }: { cell: LiveCell | undefined }) {
             <span className="absolute inset-0 rounded-full bg-cyan-400 animate-pulse-soft" />
           </span>
           <span className="font-mono text-cyan-700 text-xs font-semibold">
-            {p ? `${p.done}/${p.total}` : '运行中'}
+            {p ? `${p.done}/${p.total}` : t('运行中', 'Running')}
           </span>
         </div>
         <div className="h-1 bg-cyan-100 rounded mt-1 overflow-hidden">
@@ -211,7 +216,7 @@ function CellTile({ cell }: { cell: LiveCell | undefined }) {
 
   return (
     <div className="text-center bg-slate-50 border border-slate-300 rounded-md px-2 py-1.5">
-      <div className="text-xs text-slate-500">待跑</div>
+      <div className="text-xs text-slate-500">{t('待跑', 'Pending')}</div>
     </div>
   )
 }

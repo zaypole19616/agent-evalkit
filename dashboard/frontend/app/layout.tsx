@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Nav } from '@/components/nav'
 import { AuthProvider } from '@/lib/auth-context'
 import { AuthGuard } from '@/components/auth-guard'
+import { LangProvider } from '@/lib/i18n'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-sans' })
 const mono = JetBrains_Mono({ subsets: ['latin'], display: 'swap', variable: '--font-mono' })
@@ -35,13 +36,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh" className={`${inter.variable} ${mono.variable}`}>
       <body className="min-h-screen">
-        <AuthProvider>
-          <Ambient />
-          <Nav />
-          <main className="px-6 py-8 max-w-7xl mx-auto">
-            <AuthGuard>{children}</AuthGuard>
-          </main>
-        </AuthProvider>
+        <LangProvider>
+          <AuthProvider>
+            <Ambient />
+            <Nav />
+            <main className="px-6 py-8 max-w-7xl mx-auto">
+              <AuthGuard>{children}</AuthGuard>
+            </main>
+          </AuthProvider>
+        </LangProvider>
       </body>
     </html>
   )

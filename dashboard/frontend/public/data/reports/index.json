@@ -1,7 +1,7 @@
 [
   {
-    "batch_id": "报告 1",
-    "title": "报告 1",
+    "batch_id": "Report 1",
+    "title": "Report 1",
     "date": "2026-06-26",
     "engine_version": "",
     "models": [
@@ -11,8 +11,8 @@
     "report_count": 4
   },
   {
-    "batch_id": "报告 2",
-    "title": "报告 2",
+    "batch_id": "Report 2",
+    "title": "Report 2",
     "date": "2026-06-26",
     "engine_version": "",
     "models": [

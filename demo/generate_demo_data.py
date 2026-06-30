@@ -6,11 +6,11 @@ content is obviously placeholder, not real evaluation data:
 
   - Models: a real, public model lineup, in a fixed leaderboard
     order. Scores and prices all render as "—".
-  - Test sets: generic placeholders "测试集 1 / 2 / 3" grouped into the
-    two generic categories (任务类型 1 / 任务类型 2, defined in
+  - Test sets: generic placeholders "Test set 1 / 2 / 3" grouped into the
+    two generic categories (Task type 1 / Task type 2, defined in
     frontend lib/task-meta.ts).
-  - Test cases: "test case 1 / 2 / 3" with body "test case N 内容".
-  - Reports: placeholder batches "报告 1 / 2" with mock markdown.
+  - Test cases: "test-case-1 / 2 / 3" with body "Test case N content".
+  - Reports: placeholder batches "Report 1 / 2" with mock markdown.
 
 No real prompts, rubrics, scores, or report text ship here.
 
@@ -24,6 +24,8 @@ Writes the files the frontend's static fallback reads:
     <out>/reports/index.json
     <out>/reports/<batch>/manifest.json
     <out>/reports/<batch>/<file>.md
+    <out>/live.json
+    <out>/history.json
 
 Default <out> is the dashboard frontend's public/data. Run:
 
@@ -52,8 +54,8 @@ MODELS = [
 
 # Placeholder test sets (task key == display label via taskLabel fallback).
 # Category assignment lives in frontend lib/task-meta.ts:
-#   任务类型 1 → [测试集 1, 测试集 2],  任务类型 2 → [测试集 3]
-TASKS = ["测试集 1", "测试集 2", "测试集 3"]
+#   Task type 1 → [Test set 1, Test set 2],  Task type 2 → [Test set 3]
+TASKS = ["Test set 1", "Test set 2", "Test set 3"]
 CASES_PER_TASK = 3
 
 
@@ -61,9 +63,9 @@ def fixtures_jsonl() -> str:
     lines = []
     for c in range(1, CASES_PER_TASK + 1):
         lines.append(json.dumps({
-            "id": f"test case {c}",
-            "prompt": f"test case {c} 内容",
-            "expected_answer_intent": f"test case {c} 期望答案",
+            "id": f"test-case-{c}",
+            "prompt": f"Test case {c} content (placeholder).",
+            "expected_answer_intent": f"Test case {c} expected answer (placeholder).",
             "files": [],
             "tags": ["mock"],
         }, ensure_ascii=False))
@@ -72,10 +74,12 @@ def fixtures_jsonl() -> str:
 
 def rubric_md(task: str) -> str:
     return (
-        f"# {task} — 评分标准（mock）\n\n"
-        "这是占位评分标准，用于演示看板，非真实评测口径。\n\n"
-        "| 分数 | 含义 |\n|---:|---|\n"
-        "| 5 | 占位：完全满足 |\n| 3 | 占位：部分满足 |\n| 0 | 占位：未满足 |\n"
+        f"# {task} — scoring rubric (mock)\n\n"
+        "Placeholder rubric, for the dashboard demo only — not a real scoring guide.\n\n"
+        "| Score | Meaning |\n|---:|---|\n"
+        "| 5 | Placeholder: fully satisfies |\n"
+        "| 3 | Placeholder: partially satisfies |\n"
+        "| 0 | Placeholder: does not satisfy |\n"
     )
 
 
@@ -120,34 +124,36 @@ def build_manifest() -> list[dict]:
 
 
 # --- reports -----------------------------------------------------------
-REPORT_BATCHES = ["报告 1", "报告 2"]
+REPORT_BATCHES = ["Report 1", "Report 2"]
 
 
 def report_overview_md(batch: str) -> str:
     return (
-        f"# {batch} — 综合报告（mock）\n\n"
-        "这是占位综合报告，用于演示「报告」页的渲染，内容非真实结论。\n\n"
-        "## TL;DR\n占位：本批次结论一句话。\n\n"
-        "## 逐测试集评分\n\n"
-        "| 测试集 | 评分 | 说明 |\n|---|---|---|\n"
-        "| 测试集 1 | — | 占位 |\n| 测试集 2 | — | 占位 |\n| 测试集 3 | — | 占位 |\n\n"
-        "## 使用建议\n占位：建议正文。\n"
+        f"# {batch} — overview (mock)\n\n"
+        "Placeholder overview report, to demonstrate the Reports view. Not real conclusions.\n\n"
+        "## TL;DR\nPlaceholder: one-line verdict for this batch.\n\n"
+        "## Per-test-set scores\n\n"
+        "| Test set | Score | Notes |\n|---|---|---|\n"
+        "| Test set 1 | — | placeholder |\n"
+        "| Test set 2 | — | placeholder |\n"
+        "| Test set 3 | — | placeholder |\n\n"
+        "## Recommendations\nPlaceholder: recommendations go here.\n"
     )
 
 
 def report_model_md(batch: str, model: str) -> str:
     return (
-        f"# {model} — 模型报告（mock）\n\n"
-        f"占位：{model} 在 {batch} 各测试集上的表现说明。\n\n"
-        "- 测试集 1：占位\n- 测试集 2：占位\n- 测试集 3：占位\n"
+        f"# {model} — model report (mock)\n\n"
+        f"Placeholder: how {model} did across the test sets in {batch}.\n\n"
+        "- Test set 1: placeholder\n- Test set 2: placeholder\n- Test set 3: placeholder\n"
     )
 
 
 def report_backlog_md(batch: str) -> str:
     return (
-        f"# {batch} — Bug Backlog（mock）\n\n"
-        "占位：本批次发现的问题清单。\n\n"
-        "1. 占位问题 1\n2. 占位问题 2\n"
+        f"# {batch} — Bug Backlog (mock)\n\n"
+        "Placeholder: issues found in this batch.\n\n"
+        "1. Placeholder issue 1\n2. Placeholder issue 2\n"
     )
 
 
@@ -169,9 +175,9 @@ def build_report_index() -> list[dict]:
 
 def build_report_manifest(batch: str) -> dict:
     models = MODELS[:2]
-    reports = [{"type": "overview", "file": "overview.md", "title": "综合报告"}]
+    reports = [{"type": "overview", "file": "overview.md", "title": "Overview"}]
     for i, m in enumerate(models, start=1):
-        reports.append({"type": "model", "file": f"model-{i}.md", "title": f"{m} 报告", "model": m})
+        reports.append({"type": "model", "file": f"model-{i}.md", "title": f"{m} report", "model": m})
     reports.append({"type": "backlog", "file": "backlog.md", "title": "Bug Backlog"})
     return {
         "batch_id": batch,
@@ -203,16 +209,16 @@ def write_reports(out_dir: Path) -> None:
 # --- live + history -----------------------------------------------------
 def build_live() -> dict:
     models = MODELS[:2]
-    # 2 models × 3 test sets = 6 cells; a frozen "进行中" snapshot.
+    # 2 models × 3 test sets = 6 cells; a frozen "in progress" snapshot.
     # done cells carry score=null → the matrix shows "—" (no real scores).
     cells = [
-        {"model": models[0], "task": "测试集 1", "status": "done", "score": None, "badcases": 0, "elapsed_s": 1180},
-        {"model": models[0], "task": "测试集 2", "status": "done", "score": None, "badcases": 0, "elapsed_s": 970},
-        {"model": models[0], "task": "测试集 3", "status": "running",
-         "progress": {"run_id": "mock-live-run", "done": 2, "total": 3, "latest_fixture_id": "test case 2"}},
-        {"model": models[1], "task": "测试集 1", "status": "pending"},
-        {"model": models[1], "task": "测试集 2", "status": "pending"},
-        {"model": models[1], "task": "测试集 3", "status": "pending"},
+        {"model": models[0], "task": "Test set 1", "status": "done", "score": None, "badcases": 0, "elapsed_s": 1180},
+        {"model": models[0], "task": "Test set 2", "status": "done", "score": None, "badcases": 0, "elapsed_s": 970},
+        {"model": models[0], "task": "Test set 3", "status": "running",
+         "progress": {"run_id": "mock-live-run", "done": 2, "total": 3, "latest_fixture_id": "test-case-2"}},
+        {"model": models[1], "task": "Test set 1", "status": "pending"},
+        {"model": models[1], "task": "Test set 2", "status": "pending"},
+        {"model": models[1], "task": "Test set 3", "status": "pending"},
     ]
     return {
         "mode": "chain",

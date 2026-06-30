@@ -3,25 +3,27 @@
 import Link from 'next/link'
 import useSWR from 'swr'
 import { api } from '@/lib/api-client'
+import { useT } from '@/lib/i18n'
 
 export default function ReportsIndex() {
+  const t = useT()
   const { data, error } = useSWR('report-batches', () => api.reportBatches())
-  if (error) return <p className="text-rose-400">暂时无法加载评测报告：{String(error)}</p>
-  if (!data) return <p className="text-slate-700">加载中…</p>
+  if (error) return <p className="text-rose-400">{t('暂时无法加载评测报告：', 'Couldn’t load reports: ')}{String(error)}</p>
+  if (!data) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
 
   return (
     <div className="space-y-8 animate-fade-in">
       <header>
         <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">
-          <span className="heading-gradient">评测报告</span>
+          <span className="heading-gradient">{t('评测报告', 'Evaluation reports')}</span>
         </h1>
         <p className="text-sm text-slate-700 mt-2">
-          每次对比战役一份：综合报告 + 逐模型报告 + bug backlog。结论里的 fixture 可顺指针跳到原始日志。
+          {t('每次对比战役一份：综合报告 + 逐模型报告 + bug backlog。结论里的 fixture 可顺指针跳到原始日志。', 'One per comparison campaign: overview + per-model reports + bug backlog. The fixtures in the conclusions link back to the raw logs.')}
         </p>
       </header>
 
       {data.length === 0 ? (
-        <p className="text-slate-500 text-sm">还没有报告。把一个 batch 目录放进 <code>eval-reports/</code> 即可。</p>
+        <p className="text-slate-500 text-sm">{t('还没有报告。', 'No reports yet. ')}{t('把一个 batch 目录放进', 'Drop a batch folder into')} <code>eval-reports/</code>{t('即可。', '.')}</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {data.map((b) => (
@@ -43,7 +45,7 @@ export default function ReportsIndex() {
               </div>
               <div className="flex flex-wrap gap-1.5 mb-3">
                 <span className="chip">{b.date}</span>
-                <span className="chip">{b.report_count} 份报告</span>
+                <span className="chip">{b.report_count} {t('份报告', 'reports')}</span>
                 {b.engine_version && <span className="chip font-mono">engine {b.engine_version}</span>}
               </div>
               <div className="flex flex-wrap gap-x-2 gap-y-0.5">

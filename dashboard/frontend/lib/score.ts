@@ -74,7 +74,7 @@ export function computeCostByModel(
   tasksByName: Leaderboard['tasks'],
 ): Map<string, ModelCost> {
   const allTaskNames = Object.keys(tasksByName)
-  const totalByCategory: Record<TaskCategory, number> = { '任务类型 1': 0, '任务类型 2': 0 }
+  const totalByCategory: Record<TaskCategory, number> = { 'Task type 1': 0, 'Task type 2': 0 }
   for (const t of allTaskNames) totalByCategory[taskCategory(t)]++
 
   // model → task → mean(cost_median_usd over (model, task)'s runs)
@@ -96,22 +96,22 @@ export function computeCostByModel(
 
   const out = new Map<string, ModelCost>()
   for (const [model, taskMap] of perTaskMean) {
-    const byCat: Record<TaskCategory, number[]> = { '任务类型 1': [], '任务类型 2': [] }
+    const byCat: Record<TaskCategory, number[]> = { 'Task type 1': [], 'Task type 2': [] }
     for (const [taskName, cost] of taskMap) byCat[taskCategory(taskName)].push(cost)
 
     const generation: CategoryCost = {
-      mean: byCat['任务类型 1'].length
-        ? byCat['任务类型 1'].reduce((a, b) => a + b, 0) / byCat['任务类型 1'].length
+      mean: byCat['Task type 1'].length
+        ? byCat['Task type 1'].reduce((a, b) => a + b, 0) / byCat['Task type 1'].length
         : null,
-      covered: byCat['任务类型 1'].length,
-      total: totalByCategory['任务类型 1'],
+      covered: byCat['Task type 1'].length,
+      total: totalByCategory['Task type 1'],
     }
     const retrieval: CategoryCost = {
-      mean: byCat['任务类型 2'].length
-        ? byCat['任务类型 2'].reduce((a, b) => a + b, 0) / byCat['任务类型 2'].length
+      mean: byCat['Task type 2'].length
+        ? byCat['Task type 2'].reduce((a, b) => a + b, 0) / byCat['Task type 2'].length
         : null,
-      covered: byCat['任务类型 2'].length,
-      total: totalByCategory['任务类型 2'],
+      covered: byCat['Task type 2'].length,
+      total: totalByCategory['Task type 2'],
     }
     const taskCosts = Array.from(taskMap.values())
     out.set(model, {
@@ -137,10 +137,10 @@ export function computeChainCategoryCost(
     for (const r of rows) lookup.set(`${taskName}::${r.run_id}`, r)
   }
   const taskKeys = Object.keys(runIdByTask)
-  const totalByCategory: Record<TaskCategory, number> = { '任务类型 1': 0, '任务类型 2': 0 }
+  const totalByCategory: Record<TaskCategory, number> = { 'Task type 1': 0, 'Task type 2': 0 }
   for (const t of taskKeys) totalByCategory[taskCategory(t)]++
 
-  const costsByCat: Record<TaskCategory, number[]> = { '任务类型 1': [], '任务类型 2': [] }
+  const costsByCat: Record<TaskCategory, number[]> = { 'Task type 1': [], 'Task type 2': [] }
   let fullSum = 0
   let anyCost = false
   for (const task of taskKeys) {
@@ -160,5 +160,5 @@ export function computeChainCategoryCost(
     covered: costsByCat[name].length,
     total: totalByCategory[name],
   })
-  return { generation: cat('任务类型 1'), retrieval: cat('任务类型 2'), full_sum: fullSum }
+  return { generation: cat('Task type 1'), retrieval: cat('Task type 2'), full_sum: fullSum }
 }

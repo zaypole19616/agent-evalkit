@@ -5,17 +5,22 @@ import {
 } from 'recharts'
 import type { TaskSummary } from '@/lib/types'
 import { OutwardTick } from '@/components/radar-tick'
+import { useT } from '@/lib/i18n'
 
-const TASK_LABELS: Record<string, string> = {
-  search: '搜索', html_gen: 'HTML', recall: '召回',
-  md_gen: 'Markdown', html_gen_doc: 'HTML 文档',
-  xlsx_gen: 'Excel', pptx_gen: 'PPT', pdf_docx_gen: 'PDF/Word',
+function taskLabels(t: (zh: string, en: string) => string): Record<string, string> {
+  return {
+    search: t('搜索', 'Search'), html_gen: 'HTML', recall: t('召回', 'Recall'),
+    md_gen: 'Markdown', html_gen_doc: t('HTML 文档', 'HTML doc'),
+    xlsx_gen: 'Excel', pptx_gen: 'PPT', pdf_docx_gen: 'PDF/Word',
+  }
 }
 
 export function TaskRadar({ tasks }: { tasks: TaskSummary[] }) {
-  const data = tasks.map((t) => ({
-    task: TASK_LABELS[t.task] ?? t.task,
-    score: t.score,
+  const t = useT()
+  const labels = taskLabels(t)
+  const data = tasks.map((item) => ({
+    task: labels[item.task] ?? item.task,
+    score: item.score,
   }))
   return (
     <div className="w-full h-80">

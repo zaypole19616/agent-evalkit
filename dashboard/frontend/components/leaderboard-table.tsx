@@ -8,6 +8,7 @@ import { api } from '@/lib/api-client'
 import { taskLabel, taskDescription } from '@/lib/task-meta'
 import { modelDisplayName } from '@/lib/model-meta'
 import { computeCostByModel, computeWeightedByModel } from '@/lib/score'
+import { useT } from '@/lib/i18n'
 
 // Per-category mean cost — what does ONE operation in this category cost
 // on this model. Generation tasks (html/md/pptx/...) and retrieval tasks
@@ -17,6 +18,7 @@ import { computeCostByModel, computeWeightedByModel } from '@/lib/score'
 import type { CategoryCost, ModelCost } from '@/lib/score'
 
 function CategoryCostCell({ cell }: { cell?: CategoryCost }) {
+  const t = useT()
   if (!cell || cell.mean == null) return <span className="text-slate-500">—</span>
   const partial = cell.covered < cell.total
   return (
@@ -26,7 +28,10 @@ function CategoryCostCell({ cell }: { cell?: CategoryCost }) {
         <span
           aria-hidden
           className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 align-middle"
-          title={`仅含 ${cell.covered}/${cell.total} 个任务的成本（其余未跑测或 token 未 backfill）`}
+          title={t(
+            `仅含 ${cell.covered}/${cell.total} 个任务的成本（其余未跑测或 token 未 backfill）`,
+            `Cost covers only ${cell.covered}/${cell.total} tasks (the rest are untested or have no token backfill)`,
+          )}
         />
       )}
     </span>
@@ -78,6 +83,7 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 export function GlobalRanking({ data }: { data: Leaderboard }) {
+  const t = useT()
   const counts = runCounts(data.global)
   // Override the runner-written ``weighted_score`` with a real
   // cross-task mean per the comment on ``computeWeightedByModel``.
@@ -102,14 +108,14 @@ export function GlobalRanking({ data }: { data: Leaderboard }) {
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
-        <p className="section-eyebrow">Global Ranking · {rows.length} 模型</p>
+        <p className="section-eyebrow">Global Ranking · {rows.length} {t('个模型', 'models')}</p>
         {selected.size >= 2 ? (
           <Link href={compareHref} className="btn-primary">
-            对比所选 ({selected.size})
+            {t('对比所选', 'Compare selected')} ({selected.size})
             <span aria-hidden>→</span>
           </Link>
         ) : (
-          <span className="text-xs text-slate-500">勾选 ≥ 2 个模型可对比</span>
+          <span className="text-xs text-slate-500">{t('勾选 ≥ 2 个模型可对比', 'Select ≥ 2 models to compare')}</span>
         )}
       </div>
 
@@ -118,23 +124,29 @@ export function GlobalRanking({ data }: { data: Leaderboard }) {
           <thead>
             <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider">
               <th className="p-3 w-10 text-center align-middle"></th>
-              <th className="p-3 w-16 text-center align-middle">排名</th>
-              <th className="p-3 text-center align-middle">模型</th>
-              <th className="p-3 text-center align-middle">加权分</th>
+              <th className="p-3 w-16 text-center align-middle">{t('排名', 'Rank')}</th>
+              <th className="p-3 text-center align-middle">{t('模型', 'Model')}</th>
+              <th className="p-3 text-center align-middle">{t('加权分', 'Weighted')}</th>
               <th
                 className="p-3 text-center align-middle hidden md:table-cell"
-                title="任务类型 1 的平均单次成本：mean(该类别下各测试集的 cost_median_usd)"
+                title={t(
+                  '任务类型 1 的平均单次成本：mean(该类别下各测试集的 cost_median_usd)',
+                  'Task type 1 average per-operation cost: mean(cost_median_usd across the test sets in this category)',
+                )}
               >
-                任务类型 1 均价
+                {t('任务类型 1 均价', 'Task type 1 avg cost')}
               </th>
               <th
                 className="p-3 text-center align-middle hidden md:table-cell"
-                title="任务类型 2 的平均单次成本：mean(该类别下各测试集的 cost_median_usd)"
+                title={t(
+                  '任务类型 2 的平均单次成本：mean(该类别下各测试集的 cost_median_usd)',
+                  'Task type 2 average per-operation cost: mean(cost_median_usd across the test sets in this category)',
+                )}
               >
-                任务类型 2 均价
+                {t('任务类型 2 均价', 'Task type 2 avg cost')}
               </th>
-              <th className="p-3 text-center align-middle hidden md:table-cell">最新测试</th>
-              <th className="p-3 text-center align-middle hidden sm:table-cell">历史</th>
+              <th className="p-3 text-center align-middle hidden md:table-cell">{t('最新测试', 'Last tested')}</th>
+              <th className="p-3 text-center align-middle hidden sm:table-cell">{t('历史', 'History')}</th>
             </tr>
           </thead>
           <tbody>
@@ -158,7 +170,7 @@ export function GlobalRanking({ data }: { data: Leaderboard }) {
                       checked={selected.has(r.model)}
                       onChange={() => toggle(r.model)}
                       className="accent-cyan-500"
-                      aria-label={`选中 ${modelDisplayName(r.model)}`}
+                      aria-label={t(`选中 ${modelDisplayName(r.model)}`, `Select ${modelDisplayName(r.model)}`)}
                     />
                   </td>
                   <td className="p-3 text-center align-middle">
@@ -181,7 +193,10 @@ export function GlobalRanking({ data }: { data: Leaderboard }) {
                     className="p-3 text-center align-middle text-slate-700 hidden md:table-cell"
                     title={
                       costByModel.get(r.model)
-                        ? `整套跑测总和: $${costByModel.get(r.model)!.full_sum.toFixed(4)} (${costByModel.get(r.model)!.total_covered}/${costByModel.get(r.model)!.total_tasks} task)`
+                        ? t(
+                            `整套跑测总和: $${costByModel.get(r.model)!.full_sum.toFixed(4)} (${costByModel.get(r.model)!.total_covered}/${costByModel.get(r.model)!.total_tasks} task)`,
+                            `Full run total: $${costByModel.get(r.model)!.full_sum.toFixed(4)} (${costByModel.get(r.model)!.total_covered}/${costByModel.get(r.model)!.total_tasks} tasks)`,
+                          )
                         : undefined
                     }
                   >
@@ -198,10 +213,10 @@ export function GlobalRanking({ data }: { data: Leaderboard }) {
                       <span className="text-slate-500 text-xs">—</span>
                     ) : n > 1 ? (
                       <Link href={href} className="text-slate-700 hover:text-indigo-700 transition-colors text-xs">
-                        {n} 次 →
+                        {n} {t('次', 'runs')} →
                       </Link>
                     ) : (
-                      <span className="text-slate-500 text-xs">1 次</span>
+                      <span className="text-slate-500 text-xs">1 {t('次', 'run')}</span>
                     )}
                   </td>
                 </tr>
@@ -215,6 +230,7 @@ export function GlobalRanking({ data }: { data: Leaderboard }) {
 }
 
 export function TaskRanking({ task, rows }: { task: string; rows: LeaderboardRow[] }) {
+  const t = useT()
   const sorted = latestPerModel(rows).sort((a, b) => b.score - a.score)
   const desc = taskDescription(task)
 
@@ -225,7 +241,7 @@ export function TaskRanking({ task, rows }: { task: string; rows: LeaderboardRow
         {desc && <p className="text-xs text-slate-700 mt-1 line-clamp-2 leading-relaxed">{desc}</p>}
       </div>
       {sorted.length === 0 ? (
-        <p className="text-xs text-slate-500 italic mt-2">暂无跑测数据</p>
+        <p className="text-xs text-slate-500 italic mt-2">{t('暂无跑测数据', 'No runs yet')}</p>
       ) : (
         <table className="w-full text-sm mt-1">
           <tbody>

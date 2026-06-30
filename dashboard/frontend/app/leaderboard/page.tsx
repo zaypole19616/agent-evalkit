@@ -3,14 +3,16 @@
 import useSWR from 'swr'
 import { api } from '@/lib/api-client'
 import { GlobalRanking, TaskRanking } from '@/components/leaderboard-table'
-import { groupTasksByCategory } from '@/lib/task-meta'
+import { groupTasksByCategory, categoryLabel } from '@/lib/task-meta'
+import { useT } from '@/lib/i18n'
 
 export default function LeaderboardPage() {
+  const t = useT()
   const { data, error, isLoading } = useSWR('leaderboard', () => api.leaderboard())
   const { data: bench } = useSWR('benchmarks', () => api.benchmarks())
 
-  if (isLoading) return <p className="text-slate-700">加载中…</p>
-  if (error) return <p className="text-rose-400">加载失败：{String(error)}</p>
+  if (isLoading) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
+  if (error) return <p className="text-rose-400">{t('加载失败：', 'Failed to load: ')}{String(error)}</p>
   if (!data) return null
 
   // Task list = union of (benchmark suite registered tasks) and (tasks that
@@ -25,10 +27,10 @@ export default function LeaderboardPage() {
       <section>
         <div className="flex items-baseline justify-between mb-4">
           <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">
-            模型评测<span className="heading-gradient">总榜</span>
+            {t('模型评测', 'Model evaluation ')}<span className="heading-gradient">{t('总榜', 'Leaderboard')}</span>
           </h1>
           <p className="text-xs text-slate-500 font-mono">
-            更新于 {Number.isNaN(Date.parse(data.updated_at)) ? '—' : `${new Date(data.updated_at).toISOString().slice(0, 19)}Z`}
+            {t('更新于', 'Updated')} {Number.isNaN(Date.parse(data.updated_at)) ? '—' : `${new Date(data.updated_at).toISOString().slice(0, 19)}Z`}
           </p>
         </div>
         <GlobalRanking data={data} />
@@ -36,7 +38,7 @@ export default function LeaderboardPage() {
 
       <section>
         <div className="flex items-baseline justify-between mb-4">
-          <h2 className="text-xl font-semibold text-slate-900">按任务排名</h2>
+          <h2 className="text-xl font-semibold text-slate-900">{t('按任务排名', 'Per task')}</h2>
           <p className="section-eyebrow">Per Task</p>
         </div>
         <div className="space-y-8">
@@ -44,7 +46,7 @@ export default function LeaderboardPage() {
             <div key={category}>
               <div className="flex items-center gap-2 mb-3">
                 <span className="h-px flex-1 bg-gradient-to-r from-slate-700 to-transparent" />
-                <h3 className="section-eyebrow whitespace-nowrap">{category}</h3>
+                <h3 className="section-eyebrow whitespace-nowrap">{categoryLabel(category, t)}</h3>
                 <span className="h-px flex-1 bg-gradient-to-l from-slate-700 to-transparent" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

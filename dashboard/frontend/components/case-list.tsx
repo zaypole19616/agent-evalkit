@@ -4,31 +4,34 @@ import Link from 'next/link'
 import useSWR from 'swr'
 import clsx from 'clsx'
 import { api } from '@/lib/api-client'
+import { useT } from '@/lib/i18n'
 
 export function CaseList({ runId, task }: { runId: string; task: string }) {
+  const t = useT()
   const { data, isLoading, error } = useSWR(`cases-${runId}-${task}`, () => api.cases(runId, task))
-  if (isLoading) return <p className="text-sm text-slate-700">加载 cases 中…</p>
-  if (error) return <p className="text-rose-400 text-sm">加载失败：{String(error)}</p>
-  if (!data || data.length === 0) return <p className="text-sm text-slate-700">暂无记录的 case。</p>
+  if (isLoading) return <p className="text-sm text-slate-700">{t('加载 cases 中…', 'Loading cases…')}</p>
+  if (error) return <p className="text-rose-400 text-sm">{t('加载失败：', 'Failed to load: ')}{String(error)}</p>
+  if (!data || data.length === 0) return <p className="text-sm text-slate-700">{t('暂无记录的 case。', 'No recorded cases.')}</p>
 
   const bad = data.filter((c) => c.status === 'bad')
   const pass = data.filter((c) => c.status === 'pass')
 
   return (
     <div className="space-y-5">
-      <Section title="Bad cases" count={bad.length} cases={bad} runId={runId} task={task} accent="rose" />
-      <Section title="Passes" count={pass.length} cases={pass} runId={runId} task={task} accent="emerald" />
+      <Section title="Bad cases" count={bad.length} cases={bad} runId={runId} task={task} accent="rose" t={t} />
+      <Section title="Passes" count={pass.length} cases={pass} runId={runId} task={task} accent="emerald" t={t} />
     </div>
   )
 }
 
-function Section({ title, count, cases, runId, task, accent }: {
+function Section({ title, count, cases, runId, task, accent, t }: {
   title: string
   count: number
   cases: Array<{ fixture_id: string; status: 'pass' | 'bad'; elapsed_s: number | null; tool_call_count: number | null; response_chars: number; judge_score?: number; failure_class?: string }>
   runId: string
   task: string
   accent: 'rose' | 'emerald'
+  t: (zh: string, en: string) => string
 }) {
   if (cases.length === 0) return null
   return (
@@ -53,7 +56,7 @@ function Section({ title, count, cases, runId, task, accent }: {
               {c.fixture_id}
             </Link>
             {c.judge_score != null && (
-              <span className="chip">判官 {c.judge_score}</span>
+              <span className="chip">{t('判官', 'Judge')} {c.judge_score}</span>
             )}
             {c.failure_class && <span className="chip-rose">{c.failure_class}</span>}
             <span className="ml-auto text-xs text-slate-500 font-mono">

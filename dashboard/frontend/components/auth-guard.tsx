@@ -7,8 +7,10 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import { useT } from '@/lib/i18n'
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
+  const t = useT()
   const { ready, enabled, token } = useAuth()
   const pathname = usePathname()
 
@@ -19,9 +21,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!token) window.location.href = '/login/'
   }, [ready, enabled, token, pathname])
 
-  if (!ready) return <p className="text-slate-700">加载中…</p>
+  if (!ready) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
   if (enabled && !token && !pathname?.startsWith('/login')) {
-    return <p className="text-slate-700">正在跳转登录…</p>
+    return <p className="text-slate-700">{t('正在跳转登录…', 'Redirecting to sign-in…')}</p>
   }
   return <>{children}</>
 }

@@ -5,13 +5,15 @@ import useSWR from 'swr'
 import { useParams } from 'next/navigation'
 import { api } from '@/lib/api-client'
 import { FixtureFiles } from '@/components/fixture-viewer'
+import { useT } from '@/lib/i18n'
 
 export default function FixturePage() {
+  const t = useT()
   const params = useParams<{ task: string; fixture_id: string }>()
   const { data } = useSWR(`bm-${params.task}`, () => api.benchmark(params.task))
-  if (!data) return <p className="text-slate-700">加载中…</p>
+  if (!data) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
   const f = data.fixtures.find((x) => x.id === params.fixture_id)
-  if (!f) return <p className="text-rose-400">未找到该测试用例。</p>
+  if (!f) return <p className="text-rose-400">{t('未找到该测试用例。', 'Test case not found.')}</p>
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -39,14 +41,14 @@ export default function FixturePage() {
 
       {f.expected_answer_intent && (
         <section>
-          <h2 className="section-eyebrow mb-2">预期答案</h2>
+          <h2 className="section-eyebrow mb-2">{t('预期答案', 'Expected answer')}</h2>
           <p className="text-sm whitespace-pre-wrap text-slate-700 panel p-4">{f.expected_answer_intent}</p>
         </section>
       )}
 
       {f.files.length > 0 && (
         <section>
-          <h2 className="section-eyebrow mb-2">附件 · {f.files.length}</h2>
+          <h2 className="section-eyebrow mb-2">{t('附件', 'Attachments')} · {f.files.length}</h2>
           <FixtureFiles task={params.task} files={f.files} />
         </section>
       )}

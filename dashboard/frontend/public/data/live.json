@@ -7,9 +7,9 @@
     "Claude Opus 4.8"
   ],
   "tasks": [
-    "测试集 1",
-    "测试集 2",
-    "测试集 3"
+    "Test set 1",
+    "Test set 2",
+    "Test set 3"
   ],
   "order": "model-major",
   "total_cells": 6,
@@ -23,7 +23,7 @@
   "cells": [
     {
       "model": "Claude Fable 5",
-      "task": "测试集 1",
+      "task": "Test set 1",
       "status": "done",
       "score": null,
       "badcases": 0,
@@ -31,7 +31,7 @@
     },
     {
       "model": "Claude Fable 5",
-      "task": "测试集 2",
+      "task": "Test set 2",
       "status": "done",
       "score": null,
       "badcases": 0,
@@ -39,28 +39,28 @@
     },
     {
       "model": "Claude Fable 5",
-      "task": "测试集 3",
+      "task": "Test set 3",
       "status": "running",
       "progress": {
         "run_id": "mock-live-run",
         "done": 2,
         "total": 3,
-        "latest_fixture_id": "test case 2"
+        "latest_fixture_id": "test-case-2"
       }
     },
     {
       "model": "Claude Opus 4.8",
-      "task": "测试集 1",
+      "task": "Test set 1",
       "status": "pending"
     },
     {
       "model": "Claude Opus 4.8",
-      "task": "测试集 2",
+      "task": "Test set 2",
       "status": "pending"
     },
     {
       "model": "Claude Opus 4.8",
-      "task": "测试集 3",
+      "task": "Test set 3",
       "status": "pending"
     }
   ]

@@ -2,7 +2,7 @@
   "version": 1,
   "updated_at": "",
   "tasks": {
-    "测试集 1": [
+    "Test set 1": [
       {
         "model": "Claude Fable 5",
         "score": null,
@@ -112,7 +112,7 @@
         "n_full": 3
       }
     ],
-    "测试集 2": [
+    "Test set 2": [
       {
         "model": "Claude Fable 5",
         "score": null,
@@ -222,7 +222,7 @@
         "n_full": 3
       }
     ],
-    "测试集 3": [
+    "Test set 3": [
       {
         "model": "Claude Fable 5",
         "score": null,

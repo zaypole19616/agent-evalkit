@@ -1,3 +1,0 @@
-{"id": "test case 1", "prompt": "test case 1 内容", "expected_answer_intent": "test case 1 期望答案", "files": [], "tags": ["mock"]}
-{"id": "test case 2", "prompt": "test case 2 内容", "expected_answer_intent": "test case 2 期望答案", "files": [], "tags": ["mock"]}
-{"id": "test case 3", "prompt": "test case 3 内容", "expected_answer_intent": "test case 3 期望答案", "files": [], "tags": ["mock"]}

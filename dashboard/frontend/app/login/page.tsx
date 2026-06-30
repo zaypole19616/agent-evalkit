@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'
 import { useAuth } from '@/lib/auth-context'
+import { useT } from '@/lib/i18n'
 
 // /login — Google Sign-In, full-bleed marketing-style page. Three
 // long-period drifting gradient blobs paint behind the card so the
@@ -25,6 +26,7 @@ function AnimatedBackdrop() {
 }
 
 export default function LoginPage() {
+  const t = useT()
   const { ready, enabled, config, token, signIn } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -33,18 +35,18 @@ export default function LoginPage() {
     if (ready && token) window.location.href = '/leaderboard/'
   }, [ready, token])
 
-  if (!ready) return <p className="text-slate-500">加载中…</p>
+  if (!ready) return <p className="text-slate-500">{t('加载中…', 'Loading…')}</p>
 
   if (enabled === false) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-slate-50">
         <AnimatedBackdrop />
         <div className="max-w-md panel p-8 space-y-3 relative">
-          <h1 className="text-xl font-semibold text-slate-900">登录</h1>
+          <h1 className="text-xl font-semibold text-slate-900">{t('登录', 'Sign in')}</h1>
           <p className="text-sm text-slate-700">
-            当前后端未启用鉴权（开发模式）。直接访问任意页面即可。
+            {t('当前后端未启用鉴权（开发模式）。直接访问任意页面即可。', 'Auth is not enabled on the backend (dev mode). Just open any page.')}
           </p>
-          <a href="/leaderboard/" className="btn-primary w-fit mt-2">→ 进入总榜</a>
+          <a href="/leaderboard/" className="btn-primary w-fit mt-2">→ {t('进入总榜', 'Go to leaderboard')}</a>
         </div>
       </div>
     )
@@ -67,7 +69,7 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-semibold heading-gradient tracking-tight">agent-evalkit</h1>
           <p className="text-sm text-slate-600">
-            {allowed ? <>仅限 <span className="text-slate-900 font-mono">{allowed}</span> 邮箱登录</> : '登录以访问私有看板'}
+            {allowed ? <>{t('仅限', 'Only')} <span className="text-slate-900 font-mono">{allowed}</span> {t('邮箱登录', 'email may sign in')}</> : t('登录以访问私有看板', 'Sign in to access the private dashboard')}
           </p>
         </div>
 
@@ -75,7 +77,7 @@ export default function LoginPage() {
 
         {!clientId ? (
           <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-md px-3 py-2">
-            Google OAuth 客户端未配置。请联系管理员设置 <code className="text-rose-800">DASHBOARD_GOOGLE_CLIENT_ID</code>。
+            {t('Google OAuth 客户端未配置。请联系管理员设置', 'Google OAuth client not configured. Ask your admin to set')} <code className="text-rose-800">DASHBOARD_GOOGLE_CLIENT_ID</code>{t('。', '.')}
           </div>
         ) : (
           <GoogleOAuthProvider clientId={clientId}>
@@ -83,7 +85,7 @@ export default function LoginPage() {
               <GoogleLogin
                 onSuccess={async (cred) => {
                   if (!cred.credential) {
-                    setError('Google 未返回凭证')
+                    setError(t('Google 未返回凭证', 'Google returned no credential'))
                     return
                   }
                   setBusy(true)
@@ -96,7 +98,7 @@ export default function LoginPage() {
                     setError(res.error)
                   }
                 }}
-                onError={() => setError('Google 登录失败，请重试')}
+                onError={() => setError(t('Google 登录失败，请重试', 'Google sign-in failed, please try again'))}
                 theme="filled_black"
                 size="large"
                 text="signin_with"
@@ -105,7 +107,7 @@ export default function LoginPage() {
               {busy && (
                 <p className="text-sm text-cyan-700 inline-flex items-center gap-1.5">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse-soft" />
-                  校验中…
+                  {t('校验中…', 'Verifying…')}
                 </p>
               )}
               {error && (

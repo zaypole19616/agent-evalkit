@@ -8,19 +8,21 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
 } from 'recharts'
-import { taskLabel, groupTasksByCategory } from '@/lib/task-meta'
+import { taskLabel, groupTasksByCategory, categoryLabel } from '@/lib/task-meta'
 import { modelDisplayName } from '@/lib/model-meta'
 import { OutwardTick } from '@/components/radar-tick'
 import { computeChainCategoryCost, computeCostByModel, computeWeightedByModel } from '@/lib/score'
+import { useT } from '@/lib/i18n'
 
 export default function ModelView() {
+  const t = useT()
   const model = useRouteId('model')
   const { data, isLoading, error } = useSWR('leaderboard', () => api.leaderboard())
   const { data: bench } = useSWR('benchmarks', () => api.benchmarks())
   const { data: notes } = useSWR('notes', () => api.notes())
 
-  if (isLoading) return <p className="text-slate-700">加载中…</p>
-  if (error) return <p className="text-rose-400">加载失败：{String(error)}</p>
+  if (isLoading) return <p className="text-slate-700">{t('加载中…', 'Loading…')}</p>
+  if (error) return <p className="text-rose-400">{t('加载失败：', 'Failed to load: ')}{String(error)}</p>
   if (!data) return null
 
   const runs = data.global
@@ -31,8 +33,8 @@ export default function ModelView() {
     return (
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-slate-900">{modelDisplayName(model)}</h2>
-        <p className="text-sm text-slate-700">未找到该模型的跑测记录。</p>
-        <p><Link href="/leaderboard" className="text-indigo-600 hover:text-indigo-700">← 回到总榜</Link></p>
+        <p className="text-sm text-slate-700">{t('未找到该模型的跑测记录。', 'No runs found for this model.')}</p>
+        <p><Link href="/leaderboard" className="text-indigo-600 hover:text-indigo-700">{t('← 回到总榜', '← Back to leaderboard')}</Link></p>
       </div>
     )
   }
@@ -174,26 +176,26 @@ export default function ModelView() {
           href="/leaderboard"
           className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-700 transition-colors mb-3"
         >
-          <span aria-hidden>←</span> 总榜
+          <span aria-hidden>←</span> {t('总榜', 'Leaderboard')}
         </Link>
         <h1 className="text-3xl font-semibold text-slate-900 tracking-tight">
           {modelDisplayName(model)}
         </h1>
         <p className="text-sm text-slate-700 mt-2 font-mono">
-          {model} · 共 {chainRows.length} 次跑测 · 完整轮次{' '}
+          {model}{t(` · 共 ${chainRows.length} 次跑测 · 完整轮次 `, ` · ${chainRows.length} runs · complete rounds `)}
           <span className="text-slate-900 font-semibold">{completeChains.length}</span>
           {radarRow && (
             <>
-              {' · 加权分 '}
+              {t(' · 加权分 ', ' · Weighted ')}
               <span className="text-indigo-700 font-semibold">
                 {(trueWeightedForModel ?? radarRow.weighted).toFixed(3)}
               </span>
             </>
           )}
-          {' · 生成均价 '}
+          {t(' · 生成均价 ', ' · Task type 1 avg cost ')}
           <span
             className="text-slate-900 font-semibold"
-            title="生成类任务的平均单次成本（mean of html_gen, html_gen_doc, md_gen, pdf_docx_gen, pptx_gen, xlsx_gen 的 cost_median_usd）"
+            title={t('生成类任务的平均单次成本（mean of html_gen, html_gen_doc, md_gen, pdf_docx_gen, pptx_gen, xlsx_gen 的 cost_median_usd）', 'Average per-run cost of Task type 1 tasks (mean of html_gen, html_gen_doc, md_gen, pdf_docx_gen, pptx_gen, xlsx_gen cost_median_usd)')}
           >
             {costForModel?.generation.mean != null
               ? `$${costForModel.generation.mean.toFixed(4)}`
@@ -203,14 +205,14 @@ export default function ModelView() {
                 <span
                   aria-hidden
                   className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 align-middle ml-1"
-                  title={`仅含 ${costForModel.generation.covered}/${costForModel.generation.total} 个生成任务的成本`}
+                  title={t(`仅含 ${costForModel.generation.covered}/${costForModel.generation.total} 个生成任务的成本`, `Covers only ${costForModel.generation.covered}/${costForModel.generation.total} Task type 1 task costs`)}
                 />
               )}
           </span>
-          {' · 检索均价 '}
+          {t(' · 检索均价 ', ' · Task type 2 avg cost ')}
           <span
             className="text-slate-900 font-semibold"
-            title="检索类任务的平均单次成本（mean of recall, search 的 cost_median_usd）"
+            title={t('检索类任务的平均单次成本（mean of recall, search 的 cost_median_usd）', 'Average per-run cost of Task type 2 tasks (mean of recall, search cost_median_usd)')}
           >
             {costForModel?.retrieval.mean != null
               ? `$${costForModel.retrieval.mean.toFixed(4)}`
@@ -220,7 +222,7 @@ export default function ModelView() {
                 <span
                   aria-hidden
                   className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 align-middle ml-1"
-                  title={`仅含 ${costForModel.retrieval.covered}/${costForModel.retrieval.total} 个检索任务的成本`}
+                  title={t(`仅含 ${costForModel.retrieval.covered}/${costForModel.retrieval.total} 个检索任务的成本`, `Covers only ${costForModel.retrieval.covered}/${costForModel.retrieval.total} Task type 2 task costs`)}
                 />
               )}
           </span>
@@ -230,7 +232,7 @@ export default function ModelView() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="panel p-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="section-eyebrow">最近完整轮次 · 雷达 (0–5)</h3>
+            <h3 className="section-eyebrow">{t('最近完整轮次 · 雷达 (0–5)', 'Latest complete round · Radar (0–5)')}</h3>
             {radarRow && (
               <span className="chip-violet">{(trueWeightedForModel ?? radarRow.weighted).toFixed(3)}</span>
             )}
@@ -238,9 +240,9 @@ export default function ModelView() {
           <div className="w-full h-80">
             {!radarRow ? (
               <div className="h-full flex items-center justify-center text-sm text-slate-500 px-6 text-center">
-                还没有覆盖全 {allTasks.length} 个任务的完整轮次
+                {t(`还没有覆盖全 ${allTasks.length} 个任务的完整轮次`, `No complete round covering all ${allTasks.length} tasks yet`)}
                 <br />
-                <span className="text-xs text-slate-500">单任务跑测仅在下方历史表展示</span>
+                <span className="text-xs text-slate-500">{t('单任务跑测仅在下方历史表展示', 'Single-task runs only appear in the history table below')}</span>
               </div>
             ) : (
             <ResponsiveContainer>
@@ -278,7 +280,7 @@ export default function ModelView() {
                   labelStyle={{ color: '#475569' }}
                 />
                 <Radar
-                  name="分数"
+                  name={t('分数', 'Score')}
                   dataKey="score"
                   stroke="#22d3ee"
                   strokeWidth={2}
@@ -294,15 +296,15 @@ export default function ModelView() {
 
         <div className="panel p-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="section-eyebrow">加权分趋势 · 完整轮次</h3>
-            <span className="text-[11px] text-slate-500 font-mono">{completeChains.length} runs</span>
+            <h3 className="section-eyebrow">{t('加权分趋势 · 完整轮次', 'Weighted score trend · complete rounds')}</h3>
+            <span className="text-[11px] text-slate-500 font-mono">{completeChains.length} {t('次', 'runs')}</span>
           </div>
           <div className="w-full h-80">
             {trendData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-sm text-slate-500 text-center px-6">
-                还没有覆盖全 {allTasks.length} 个任务的完整轮次
+                {t(`还没有覆盖全 ${allTasks.length} 个任务的完整轮次`, `No complete round covering all ${allTasks.length} tasks yet`)}
                 <br />
-                <span className="text-xs text-slate-500">下方历史表展示所有单任务跑测</span>
+                <span className="text-xs text-slate-500">{t('下方历史表展示所有单任务跑测', 'The history table below shows all single-task runs')}</span>
               </div>
             ) : (
             <ResponsiveContainer>
@@ -325,7 +327,7 @@ export default function ModelView() {
                     color: '#0f172a',
                   }}
                 />
-                <Line type="monotone" dataKey="weighted" stroke="url(#trendLine)" strokeWidth={2.5} name="加权" dot={{ fill: '#22d3ee', r: 3.5, strokeWidth: 0 }} activeDot={{ r: 6, fill: '#22d3ee', stroke: '#ffffff', strokeWidth: 2 }} />
+                <Line type="monotone" dataKey="weighted" stroke="url(#trendLine)" strokeWidth={2.5} name={t('加权', 'Weighted')} dot={{ fill: '#22d3ee', r: 3.5, strokeWidth: 0 }} activeDot={{ r: 6, fill: '#22d3ee', stroke: '#ffffff', strokeWidth: 2 }} />
               </LineChart>
             </ResponsiveContainer>
             )}
@@ -336,16 +338,16 @@ export default function ModelView() {
       {(genCoverage > 0 || retCoverage > 0) && (
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <CategoryCostTrendPanel
-            title="生成类成本趋势"
-            subtitle={`${genCoverage}/${categoryCostTrend.length} 完整轮次`}
+            title={t('生成类成本趋势', 'Task type 1 cost trend')}
+            subtitle={t(`${genCoverage}/${categoryCostTrend.length} 完整轮次`, `${genCoverage}/${categoryCostTrend.length} complete rounds`)}
             dataKey="generation"
             data={categoryCostTrend}
             stroke="#22d3ee"
             fill="#22d3ee"
           />
           <CategoryCostTrendPanel
-            title="检索类成本趋势"
-            subtitle={`${retCoverage}/${categoryCostTrend.length} 完整轮次`}
+            title={t('检索类成本趋势', 'Task type 2 cost trend')}
+            subtitle={t(`${retCoverage}/${categoryCostTrend.length} 完整轮次`, `${retCoverage}/${categoryCostTrend.length} complete rounds`)}
             dataKey="retrieval"
             data={categoryCostTrend}
             stroke="#a855f7"
@@ -356,21 +358,21 @@ export default function ModelView() {
 
       <section>
         <div className="flex items-baseline justify-between mb-3">
-          <h2 className="section-eyebrow">历史跑测 · {chainRows.length} runs</h2>
-          <span className="text-[11px] text-slate-500 font-mono">最新一次高亮</span>
+          <h2 className="section-eyebrow">{t('历史跑测 · ', 'History · ')}{chainRows.length} {t('次', 'runs')}</h2>
+          <span className="text-[11px] text-slate-500 font-mono">{t('最新一次高亮', 'Latest run highlighted')}</span>
         </div>
         <div className="panel overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider">
-                <th rowSpan={2} className="text-center p-2.5 align-middle border-b border-slate-200">测试时间</th>
+                <th rowSpan={2} className="text-center p-2.5 align-middle border-b border-slate-200">{t('测试时间', 'Tested at')}</th>
                 <th
                   rowSpan={2}
                   className="text-center p-2.5 align-middle border-b border-slate-200"
-                  title="加权分（粗体）+ 该 chain 内所有已 backfill 任务的真实 cost_median_usd 之和（带 (X/Y) 表示部分 task 未 backfill）"
+                  title={t('加权分（粗体）+ 该 chain 内所有已 backfill 任务的真实 cost_median_usd 之和（带 (X/Y) 表示部分 task 未 backfill）', 'Weighted score (bold) + sum of real cost_median_usd across all backfilled tasks in this chain ((X/Y) means some tasks not yet backfilled)')}
                 >
-                  加权分<br/>
-                  <span className="text-[10px] font-normal text-slate-500 normal-case tracking-normal">/ 生成 · 检索 均价</span>
+                  {t('加权分', 'Weighted')}<br/>
+                  <span className="text-[10px] font-normal text-slate-500 normal-case tracking-normal">{t('/ 生成 · 检索 均价', '/ Task type 1 · Task type 2 avg cost')}</span>
                 </th>
                 {groups.map((g) => (
                   <th
@@ -378,10 +380,10 @@ export default function ModelView() {
                     colSpan={g.tasks.length}
                     className="text-center p-2.5 text-[11px] uppercase tracking-wider text-slate-700 border-b border-slate-200 border-l border-slate-200"
                   >
-                    {g.category}
+                    {categoryLabel(g.category, t)}
                   </th>
                 ))}
-                <th rowSpan={2} className="text-center p-2.5 align-middle border-b border-slate-200 border-l border-slate-200">备注</th>
+                <th rowSpan={2} className="text-center p-2.5 align-middle border-b border-slate-200 border-l border-slate-200">{t('备注', 'Note')}</th>
                 <th rowSpan={2} className="text-center p-2.5 align-middle border-b border-slate-200">Run ID</th>
               </tr>
               <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider">
@@ -436,11 +438,11 @@ export default function ModelView() {
                         return (
                           <div
                             className="text-[10px] text-slate-500 font-mono"
-                            title={`生成均价 (${cc.generation.covered}/${cc.generation.total}) · 检索均价 (${cc.retrieval.covered}/${cc.retrieval.total}) · 该 chain 全套总和 $${cc.full_sum.toFixed(4)}`}
+                            title={t(`生成均价 (${cc.generation.covered}/${cc.generation.total}) · 检索均价 (${cc.retrieval.covered}/${cc.retrieval.total}) · 该 chain 全套总和 $${cc.full_sum.toFixed(4)}`, `Task type 1 avg cost (${cc.generation.covered}/${cc.generation.total}) · Task type 2 avg cost (${cc.retrieval.covered}/${cc.retrieval.total}) · full-set total for this chain $${cc.full_sum.toFixed(4)}`)}
                           >
-                            <span title="生成均价">生 {fmt(cc.generation)}</span>
+                            <span title={t('生成均价', 'Task type 1 avg cost')}>{t('生 ', 'T1 ')}{fmt(cc.generation)}</span>
                             <span className="text-slate-400 mx-1">·</span>
-                            <span title="检索均价">检 {fmt(cc.retrieval)}</span>
+                            <span title={t('检索均价', 'Task type 2 avg cost')}>{t('检 ', 'T2 ')}{fmt(cc.retrieval)}</span>
                           </div>
                         )
                       })()}
@@ -462,7 +464,7 @@ export default function ModelView() {
                           >
                             <div
                               className={score == null ? 'text-slate-500' : partial ? 'text-amber-600' : 'text-slate-900'}
-                              title={partial ? `测试集未跑全：仅 ${cov!.n_scored}/${cov!.n_full} 个用例有分，分数按已跑出的用例计算` : undefined}
+                              title={partial ? t(`测试集未跑全：仅 ${cov!.n_scored}/${cov!.n_full} 个用例有分，分数按已跑出的用例计算`, `Test set not fully run: only ${cov!.n_scored}/${cov!.n_full} cases scored; the score is computed over the cases that did run`) : undefined}
                             >
                               {score == null ? (
                                 '—'
@@ -485,7 +487,7 @@ export default function ModelView() {
                             )}
                             <div
                               className="text-[10px] text-slate-500"
-                              title="该任务在这次跑测的 cost_median_usd（每次对话的成本估算）"
+                              title={t('该任务在这次跑测的 cost_median_usd（每次对话的成本估算）', 'cost_median_usd for this task in this run (estimated cost per conversation)')}
                             >
                               {cost != null && cost > 0 ? `$${cost.toFixed(4)}` : '—'}
                             </div>
@@ -551,6 +553,7 @@ function CategoryCostTrendPanel({
   stroke: string
   fill: string
 }) {
+  const t = useT()
   const hasData = data.some((r) => r[dataKey] != null)
   return (
     <div className="panel p-5">
@@ -561,7 +564,7 @@ function CategoryCostTrendPanel({
       <div className="w-full h-64">
         {!hasData ? (
           <div className="h-full flex items-center justify-center text-sm text-slate-500 text-center px-6">
-            还没有完整覆盖该类全部任务的 chain
+            {t('还没有完整覆盖该类全部任务的 chain', 'No chain fully covers every task in this category yet')}
           </div>
         ) : (
           <ResponsiveContainer>
@@ -594,7 +597,7 @@ function CategoryCostTrendPanel({
               <Line
                 type="monotone"
                 dataKey={dataKey}
-                name="整套成本"
+                name={t('整套成本', 'Full-set cost')}
                 stroke={stroke}
                 strokeWidth={2.5}
                 dot={{ fill, r: 3.5, strokeWidth: 0 }}

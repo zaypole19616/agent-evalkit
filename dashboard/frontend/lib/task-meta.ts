@@ -1,13 +1,24 @@
-// Task taxonomy for the dashboard. Categories are generic ("任务类型 1/2")
-// so any project can group its own test sets; the demo maps its
-// placeholder test sets into the two buckets. taskLabel/Description fall
-// back to the raw task key when no explicit mapping is provided, so a new
-// test set shows up with its key as the label out of the box.
-export type TaskCategory = '任务类型 1' | '任务类型 2'
+// Task taxonomy for the dashboard. Categories are generic ("Task type 1/2")
+// so any project can group its own test sets; the demo maps its placeholder
+// test sets into the two buckets. taskLabel/Description fall back to the raw
+// task key when no explicit mapping is provided, so a new test set shows up
+// with its key as the label out of the box.
+export type TaskCategory = 'Task type 1' | 'Task type 2'
 
 export const TASK_CATEGORIES: Record<TaskCategory, string[]> = {
-  '任务类型 1': ['测试集 1', '测试集 2'],
-  '任务类型 2': ['测试集 3'],
+  'Task type 1': ['Test set 1', 'Test set 2'],
+  'Task type 2': ['Test set 3'],
+}
+
+// Bilingual display labels for the category keys (keys themselves are stable
+// internal ids). categoryLabel(cat, t) renders the one for the current lang.
+const CATEGORY_ZH: Record<string, string> = {
+  'Task type 1': '任务类型 1',
+  'Task type 2': '任务类型 2',
+}
+
+export function categoryLabel(cat: string, t: (zh: string, en: string) => string): string {
+  return t(CATEGORY_ZH[cat] ?? cat, cat)
 }
 
 // Optional per-task display metadata. Empty by default — taskLabel() falls
@@ -34,7 +45,7 @@ export function taskCategory(task: string): TaskCategory {
   for (const [cat, members] of Object.entries(TASK_CATEGORIES) as Array<[TaskCategory, string[]]>) {
     if (members.includes(task)) return cat
   }
-  return '任务类型 1'
+  return 'Task type 1'
 }
 
 export function groupTasksByCategory(taskKeys: string[]): Array<{ category: TaskCategory; tasks: string[] }> {
@@ -43,11 +54,11 @@ export function groupTasksByCategory(taskKeys: string[]): Array<{ category: Task
     const present = members.filter((m) => taskKeys.includes(m))
     if (present.length > 0) out.push({ category: cat, tasks: present })
   }
-  // Anything not in a category goes into a fallback bucket appended to 任务类型 1
+  // Anything not in a category goes into a fallback bucket appended to the first.
   const known = new Set(Object.values(TASK_CATEGORIES).flat())
   const unknown = taskKeys.filter((t) => !known.has(t)).sort()
   if (unknown.length > 0) {
-    out.push({ category: '任务类型 1' as TaskCategory, tasks: unknown })
+    out.push({ category: 'Task type 1' as TaskCategory, tasks: unknown })
   }
   return out
 }

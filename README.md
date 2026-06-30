@@ -33,7 +33,7 @@ A plain string-match test tells you nothing about an agent whose real answer is 
 
 ## 🖥️ The dashboard
 
-Five views, all rendered from the engine's output files (here, the synthetic demo):
+Five views, all rendered from the engine's output files (here, the synthetic demo). Available in **English / 中文** — toggle in the top-right. (Screenshots below are the Chinese UI.)
 
 <table>
   <tr>
